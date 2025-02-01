@@ -1,41 +1,46 @@
 #include "ActionStack.h"
 #include "Global.h"
+#include <list>
 
-#define NUM_ACTIONS 25
-
-static Action sRedoStack[NUM_ACTIONS];
-static Action sUndoStack[NUM_ACTIONS];
-
-static unsigned int sRedoIdx = 0;
-static unsigned int sUndoIdx = 0;
+static std::list<Action> sRedoStack;
+static std::list<Action> sUndoStack;
 
 void action_stack_clear(void)
 {
-    sRedoIdx = sUndoIdx = 0;
+    sUndoStack.clear();
+    sRedoStack.clear();
 }
 
-bool action_stack_can_undo(void) { return sUndoIdx; }
-bool action_stack_can_redo(void) { return sRedoIdx; }
+bool action_stack_can_undo(void) { return !sUndoStack.empty(); }
+bool action_stack_can_redo(void) { return !sRedoStack.empty(); }
 
 void action_stack_add_undo_action(Action action)
 {
-    sUndoStack[sUndoIdx++] = action;
+    sUndoStack.push_back(action);
 }
 
 void action_stack_do_undo(void)
 {
-    if (!sUndoIdx) return;
-    Action action = sUndoStack[--sUndoIdx];
+    if (!action_stack_can_undo()) 
+        return;
+
+    Action action = sUndoStack.back();
+    sUndoStack.pop_back();
+
     action.func(action, true);
-    sRedoStack[sRedoIdx++] = action;
+    sRedoStack.push_back(action);
 }
 
 void action_stack_do_redo(void)
 {
-    if (!sRedoIdx) return;
-    Action action = sRedoStack[--sRedoIdx];
+    if (!action_stack_can_redo()) 
+        return;
+
+    Action action = sRedoStack.back();
+    sRedoStack.pop_back();
+
     action.func(action, false);
-    sUndoStack[sUndoIdx++] = action;
+    sUndoStack.push_back(action);
 }
 
 static void action_place_tile_func(const Action &action, bool undo)
