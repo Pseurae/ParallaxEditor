@@ -64,9 +64,9 @@ int main(int argc, char *argv[])
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    load_secondary_tileset("tiles.png");
-    load_palettes("palettes");
-    load_tilemap_from_file("tamarok.bin");
+    // load_secondary_tileset("tiles.png");
+    // load_palettes("palettes");
+    // load_tilemap_from_file("tamarok.bin");
 
     while (!glfwWindowShouldClose(window))
     {
