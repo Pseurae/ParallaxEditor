@@ -46,8 +46,9 @@ uniform sampler2D texture2;
 
 void main()
 {
-    float x = texture(texture1, TexCoord).r / 16.0f * 256.0f;
-	FragColor = texture(texture2, vec2(x, 0.5f));
+    float x = texture(texture1, TexCoord).r;
+    vec4 color = texture(texture2, vec2(x / 16.0f * 256.0f, 0.5f));
+	FragColor = mix(vec4(x * 16.0f), color, color.a);
 }
 )";
 

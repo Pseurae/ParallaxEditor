@@ -49,7 +49,9 @@ out vec4 FragColor;
 void main()
 {
     float x = texture(texture1, TexCoord).r + (16.0f / 256.0f) * Palette;
-	FragColor = texture(texture2, vec2(x, 0.5f));
+    vec4 color1 = texture(texture2, vec2(x, 0.5f));
+    vec4 color2 = vec4(texture(texture1, TexCoord).r * 16.0f);
+	FragColor = mix(color1, color2, color2.a);
 }
 )";
 
