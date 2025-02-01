@@ -21,6 +21,47 @@ void load_tilemap_from_file(const std::string &fname);
 void load_secondary_tileset(const std::string &fname);
 void load_palettes(const std::string &s);
 
+void status_bar(void)
+{
+    const ImGuiViewport *viewport = ImGui::GetMainViewport();
+
+    auto barPos = ImVec2(viewport->Pos.x, viewport->Pos.y + viewport->Size.y - ImGui::GetFrameHeight());
+    auto barSize = ImVec2(viewport->Size.x, ImGui::GetFrameHeight());
+
+    ImGui::SetNextWindowPos(barPos);
+    ImGui::SetNextWindowSize(barSize);
+
+    static constexpr ImGuiWindowFlags flags = 
+        ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_MenuBar |
+        ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBackground | 
+        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+    ImGui::Begin("###StatusBar", nullptr, flags);
+
+    ImGui::SetCursorPosX(16.0f);
+    if (ImGui::BeginMenuBar())
+    {
+        static char zoomLabel[15];
+        snprintf(zoomLabel, 15, "Zoom: %i%%", (int)(global.zoomScale * 100.0f));
+
+        if (ImGui::BeginMenu(zoomLabel))
+        {
+            if (ImGui::MenuItem("100%")) global.zoomScale = 1.0f;
+            if (ImGui::MenuItem("150%")) global.zoomScale = 1.5f;
+            if (ImGui::MenuItem("200%")) global.zoomScale = 2.0f;
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenuBar();
+    }
+
+    ImGui::End();
+
+    ImGui::PopStyleVar();
+}
+
 int main(int argc, char *argv[])
 {
     ASSERT(glfwInit(), "GLFW could not be initialized.");
@@ -83,16 +124,18 @@ int main(int argc, char *argv[])
             {
                 ImGuiViewport *viewport = ImGui::GetMainViewport();
                 ImGui::SetNextWindowPos(viewport->Pos);
-                ImGui::SetNextWindowSize(viewport->Size);
+                ImGui::SetNextWindowSize(viewport->Size - ImVec2(0.0f, ImGui::GetFrameHeight()));
 
                 static constexpr ImGuiWindowFlags sWindowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse;
-                ImGui::Begin("Window", NULL, sWindowFlags | ImGuiWindowFlags_MenuBar);
+                ImGui::Begin("###ParallaxEditor", NULL, sWindowFlags | ImGuiWindowFlags_MenuBar);
 
                 main_menu_bar();
                 tileset_pane(); ImGui::SameLine();
                 tilemap_pane();
 
                 ImGui::End();
+
+                status_bar();
             }
 
             int displayW, displayH;

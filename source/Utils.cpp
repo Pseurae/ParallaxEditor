@@ -175,14 +175,14 @@ void save_as_tilemap(void)
 void open_primary_tileset(void)
 {
     std::string s;
-    if (FileDialog::Open(FileDialog::Mode::Open, { {"Tileset", "png"} }, s))
+    if (FileDialog::Open(FileDialog::Mode::Open, { {"Primary Tileset", "png"} }, s))
         load_primary_tileset(s);
 }
 
 void open_secondary_tileset(void)
 {
     std::string s;
-    if (FileDialog::Open(FileDialog::Mode::Open, { {"Tileset", "png"} }, s))
+    if (FileDialog::Open(FileDialog::Mode::Open, { {"Primary Tileset", "png"} }, s))
         load_secondary_tileset(s);
 }
 

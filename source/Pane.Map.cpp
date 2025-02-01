@@ -35,7 +35,10 @@ static void tilemap_window(void)
     auto drawList = ImGui::GetWindowDrawList();
 
     ImTextureID tex_id = (ImTextureID)(uintptr_t)global.renderer.mapFinalTex;
-    ImVec2 scale = ImVec2(4, 4);
+
+    static float zoom = 1.0f;
+
+    ImVec2 scale = ImVec2(4, 4) * global.zoomScale;
     ImVec2 size = ImVec2(256, 256);
     ImVec2 tilesize = ImVec2(8, 8);
 
@@ -91,9 +94,11 @@ static void tilemap_window(void)
     ImGui::ItemAdd(bb, 0);
 }
 
+#include <iostream>
+
 void tilemap_pane(void)
 {
-    if (ImGui::BeginChild("Tilemap"))
+    if (ImGui::BeginChild("Tilemap", ImVec2(0.0f, 0.0f), 0, ImGuiWindowFlags_HorizontalScrollbar))
     {
         tilemap_window();
         ImGui::EndChild();

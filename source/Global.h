@@ -13,7 +13,7 @@ struct Brush
 
 struct Global
 {
-    double dpiScale;
+    double dpiScale, zoomScale = 1.0f;
     Brush brush;
     Renderer renderer;
 

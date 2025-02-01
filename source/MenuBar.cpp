@@ -19,6 +19,8 @@ void main_menu_bar(void)
             if (ImGui::MenuItem("Save As Tilemap", "Ctrl+Shift+S"))
                 save_as_tilemap();
 
+            ImGui::Separator();
+
             if (ImGui::MenuItem("Open Primary Tileset", "Ctrl+Shift+1"))
                 open_primary_tileset();
 
