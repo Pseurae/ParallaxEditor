@@ -95,3 +95,10 @@ void renderer_change_palette(Renderer &r, int idx)
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 16, 1, GL_RGB, GL_UNSIGNED_BYTE, r.palettes[idx]);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+void renderer_load_map_palette(Renderer &r)
+{
+    glBindTexture(GL_TEXTURE_2D, r.mapPaletteTex);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, r.palettes);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}

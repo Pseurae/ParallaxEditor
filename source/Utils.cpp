@@ -145,6 +145,7 @@ void load_palettes(const std::string &s)
     }
 
     renderer_change_palette(global.renderer, global.brush.palette);
+    renderer_load_map_palette(global.renderer);
 }
 
 void open_tilemap(void)

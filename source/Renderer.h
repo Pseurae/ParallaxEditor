@@ -28,4 +28,5 @@ void renderer_load_primary(Renderer &, unsigned char *data);
 void renderer_load_secondary(Renderer &, unsigned char *data);
 void renderer_load_palette(Renderer &r, int idx, const Palette plt);
 void renderer_change_palette(Renderer &, int idx);
+void renderer_load_map_palette(Renderer &r);
 void renderer_call(Renderer &, unsigned short tilemap[]);

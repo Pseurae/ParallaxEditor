@@ -48,10 +48,9 @@ out vec4 FragColor;
 
 void main()
 {
-    float x = texture(texture1, TexCoord).r + (16.0f / 256.0f) * Palette;
-    vec4 color1 = texture(texture2, vec2(x, 0.5f));
-    vec4 color2 = vec4(texture(texture1, TexCoord).r * 16.0f);
-	FragColor = mix(color1, color2, color2.a);
+    float x = texture(texture1, TexCoord).r;
+    vec4 color = texture(texture2, vec2(x + (16.0f / 256.0f) * Palette, 0.5f));
+	FragColor = mix(vec4(x * 16.0f), color, color.a);
 }
 )";
 
@@ -83,19 +82,6 @@ void renderer_map_init(Renderer &r)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, r.mapElementBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * MAX_QUAD * 6, quadIndices, GL_STATIC_DRAW);
 
-    glGenFramebuffers(1, &r.mapFrameBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, r.mapFrameBuffer);
-
-    glGenTextures(1, &r.mapFinalTex);
-    glBindTexture(GL_TEXTURE_2D, r.mapFinalTex);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, r.mapFinalTex, 0);
-
     // Generate 256-color Palette
     glGenTextures(1, &r.mapPaletteTex);
     glBindTexture(GL_TEXTURE_2D, r.mapPaletteTex);
@@ -112,13 +98,19 @@ void renderer_map_init(Renderer &r)
     glUseProgram(r.mapShader);
     glUniform1i(glGetUniformLocation(r.mapShader, "texture1"), 0);
     glUniform1i(glGetUniformLocation(r.mapShader, "texture2"), 1);
-}
 
-static void renderer_load_map_palette(Renderer &r)
-{
-    glBindTexture(GL_TEXTURE_2D, r.mapPaletteTex);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, r.palettes);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glGenFramebuffers(1, &r.mapFrameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, r.mapFrameBuffer);
+
+    glGenTextures(1, &r.mapFinalTex);
+    glBindTexture(GL_TEXTURE_2D, r.mapFinalTex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, r.mapFinalTex, 0);
 }
 
 static constexpr auto sTileWidth = 8.0f / 256.0f;
@@ -195,8 +187,6 @@ static void renderer_draw_map_tile(Renderer &r, int i, unsigned short entry)
 
 void renderer_call_map(Renderer &r, unsigned short tilemap[])
 {
-    renderer_load_map_palette(r);
-
     for (int i = 0; i < MAX_QUAD; ++i)
         renderer_draw_map_tile(r, i, tilemap[i]);
 
