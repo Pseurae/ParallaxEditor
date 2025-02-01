@@ -4,6 +4,8 @@
 
 #include <GLFW/glfw3.h>
 
+static constexpr unsigned int sShortcutMask = GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT;
+
 static const Shortcut sShortcuts[] =
 {
     { GLFW_KEY_O, GLFW_MOD_CONTROL, open_tilemap },
@@ -18,11 +20,13 @@ static const Shortcut sShortcuts[] =
 
 void shortcut_callback(int key, int mods, int action)
 {
+    mods &= sShortcutMask;
+
     for (int i = 0; i < sizeof(sShortcuts) / sizeof(Shortcut); ++i)
     {
         auto s = sShortcuts[i];
         if ((action == GLFW_PRESS || (s.allowHold && action == GLFW_REPEAT)) && 
-            s.key == key && (mods & s.mods) == mods)
+            s.key == key && (mods & s.mods) == s.mods && (mods & s.mods) == mods)
         {
             s.func();
             break;

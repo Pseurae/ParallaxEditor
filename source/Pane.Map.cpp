@@ -87,6 +87,12 @@ static void tilemap_window(void)
         drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + tilesize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
     }
 
+    if (global.drawScreenBounds)
+    {
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + tilesize * scale * ImVec2(30.0f, 20.0f) + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+    }
+
     ImVec2 widgetsize = ImVec2(sTilesInRow, static_cast<int>(1024 / sTilesInRow)) * tilesize;
     ImRect bb(ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + widgetsize * scale + ImVec2(1.0f, 1.0f));
 

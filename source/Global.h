@@ -17,6 +17,8 @@ struct Global
     Brush brush;
     Renderer renderer;
 
+    bool drawScreenBounds = false;
+
     std::string tilemapPath;
     unsigned short tilemap[32 * 32];
 };

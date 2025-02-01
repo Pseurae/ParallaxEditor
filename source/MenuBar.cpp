@@ -2,6 +2,7 @@
 #include "FileDialog.h"
 #include <imgui.h>
 #include "Utils.h"
+#include "Global.h"
 #include "ActionStack.h"
 
 void main_menu_bar(void)
@@ -41,6 +42,13 @@ void main_menu_bar(void)
             if (ImGui::MenuItem("Redo", "Ctrl+Y", nullptr, action_stack_can_redo()))
                 action_stack_do_redo();
 
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("View"))
+        {
+            if (ImGui::MenuItem("Show Screen Bounds", nullptr, &global.drawScreenBounds));
+            
             ImGui::EndMenu();
         }
 
