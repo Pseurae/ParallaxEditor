@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(external)
 
 add_executable(${PROJECT_NAME}
+    source/ActionStack.cpp
     source/FileDialog.cpp
     source/Global.cpp
     source/MenuBar.cpp
@@ -15,5 +16,6 @@ add_executable(${PROJECT_NAME}
     source/Renderer.cpp
     source/Renderer.Tilemap.cpp
     source/Renderer.Tileset.cpp
+    source/Shortcut.cpp
     source/Utils.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC imgui glfw gl3w stb_image nfd)

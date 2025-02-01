@@ -15,6 +15,7 @@
 #include "Pane.Map.h"
 #include "Pane.Picker.h"
 #include "MenuBar.h"
+#include "Shortcut.h"
 
 int main(int argc, char *argv[])
 {
@@ -37,6 +38,10 @@ int main(int argc, char *argv[])
     glfwMakeContextCurrent(window);
 
     glfwShowWindow(window);
+
+    glfwSetKeyCallback(window, [](GLFWwindow* window, int k, int, int a, int m) {
+        if (a == GLFW_PRESS) shortcut_callback(k, m);
+    });
 
     ASSERT(gl3wInit() != -1, "GL3W could not be initialized.");
 

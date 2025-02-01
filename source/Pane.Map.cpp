@@ -1,4 +1,5 @@
 #include "Pane.Picker.h"
+#include "ActionStack.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -17,13 +18,16 @@ static void right_click(unsigned short i)
 
 static void left_click(unsigned int i)
 {
-    uint16_t newEntry = (
+    uint16_t newTile = (
         global.brush.tile & Mask::Index |
         ((global.brush.palette & 0xF) << 12) |
         (global.brush.xflip ? Mask::FlipX : 0) |
         (global.brush.yflip ? Mask::FlipY : 0)
     );
-    global.tilemap[i] = newEntry;
+
+    action_stack_add_undo_action(
+        action_place_tile_new(i, global.tilemap[i], newTile));
+    global.tilemap[i] = newTile;
 }
 
 static void tilemap_window(void)

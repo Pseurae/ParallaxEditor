@@ -1,6 +1,8 @@
 #include "Utils.h"
 #include "Renderer.h"
 #include "Global.h"
+#include "FileDialog.h"
+
 #include <stb_image.h>
 
 #include <string>
@@ -134,4 +136,32 @@ void load_palettes(const std::string &s)
     }
 
     renderer_change_palette(global.renderer, global.brush.palette);
+}
+
+void open_tilemap(void)
+{
+    std::string s;
+    if (FileDialog::Open(FileDialog::Mode::Open, { {"Parallax", "bin"} }, s))
+        load_tilemap(s);
+}
+
+void open_primary_tileset(void)
+{
+    std::string s;
+    if (FileDialog::Open(FileDialog::Mode::Open, { {"Tileset", "png"} }, s))
+        load_primary_tileset(s);
+}
+
+void open_secondary_tileset(void)
+{
+    std::string s;
+    if (FileDialog::Open(FileDialog::Mode::Open, { {"Tileset", "png"} }, s))
+        load_secondary_tileset(s);
+}
+
+void open_palettes(void)
+{
+    std::string s;
+    if (FileDialog::Open(FileDialog::Mode::Folder, {}, s))
+        load_palettes(s);
 }

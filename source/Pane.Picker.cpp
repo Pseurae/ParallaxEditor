@@ -45,9 +45,6 @@ void tileset_pane(void)
 {
     if (ImGui::BeginChild("Tileset", ImVec2(400.0f, 0.0f)))
     {
-        int selected_tile = 16;
-        bool xflip, yflip;
-
         ImGui::Text("ID: 0x%X", global.brush.tile);
 
         ImGui::Spacing();
@@ -69,7 +66,7 @@ void tileset_pane(void)
 
         ImGui::Spacing();
 
-        if (ImGui::BeginChild("###TilesetSelector", ImVec2(380.0f, 0.0f)))
+        if (ImGui::BeginChild("###TilesetSelector", ImVec2(400.0f, 0.0f)))
         {
             tileset_selector();
             ImGui::EndChild();
