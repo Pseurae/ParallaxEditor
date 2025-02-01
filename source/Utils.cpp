@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "Global.h"
 #include "FileDialog.h"
+#include "ActionStack.h"
 
 #include <stb_image.h>
 
@@ -152,6 +153,7 @@ void open_tilemap(void)
     if (FileDialog::Open(FileDialog::Mode::Open, { {"Parallax file", "bin"} }, s))
     {
         global.tilemapPath = s;
+        action_stack_clear();
         load_tilemap_from_file(s);
     }
 }
