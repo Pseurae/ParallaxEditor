@@ -56,7 +56,7 @@ std::vector<Color> load_palette(const std::string &fname)
     return colors;
 }
 
-void load_tilemap(const std::string &fname)
+void load_tilemap_from_file(const std::string &fname)
 {
     std::ifstream fs(fname, std::ios::binary);
 
@@ -68,6 +68,14 @@ void load_tilemap(const std::string &fname)
     }
 
     fs.close();
+}
+
+void save_tilemap_to_file(const std::string &fname)
+{
+    std::ofstream fs(fname, std::ios::binary | std::ios::trunc);
+
+    for (unsigned short entry : global.tilemap)
+        fs.write(reinterpret_cast<char *>(&entry), 2);
 }
 
 void load_primary_tileset(const std::string &fname)
@@ -141,8 +149,27 @@ void load_palettes(const std::string &s)
 void open_tilemap(void)
 {
     std::string s;
-    if (FileDialog::Open(FileDialog::Mode::Open, { {"Parallax", "bin"} }, s))
-        load_tilemap(s);
+    if (FileDialog::Open(FileDialog::Mode::Open, { {"Parallax file", "bin"} }, s))
+    {
+        global.tilemapPath = s;
+        load_tilemap_from_file(s);
+    }
+}
+
+void save_tilemap(void)
+{
+    if (global.tilemapPath.empty()) save_as_tilemap();
+    else save_tilemap_to_file(global.tilemapPath);
+}
+
+void save_as_tilemap(void)
+{
+    std::string s;
+    if (FileDialog::Open(FileDialog::Mode::Save, { {"Parallax File", "bin"} }, s))
+    {
+        global.tilemapPath = s;
+        save_tilemap_to_file(s);
+    }
 }
 
 void open_primary_tileset(void)

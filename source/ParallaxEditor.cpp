@@ -17,6 +17,10 @@
 #include "MenuBar.h"
 #include "Shortcut.h"
 
+void load_tilemap_from_file(const std::string &fname);
+void load_secondary_tileset(const std::string &fname);
+void load_palettes(const std::string &s);
+
 int main(int argc, char *argv[])
 {
     ASSERT(glfwInit(), "GLFW could not be initialized.");
@@ -40,7 +44,7 @@ int main(int argc, char *argv[])
     glfwShowWindow(window);
 
     glfwSetKeyCallback(window, [](GLFWwindow* window, int k, int, int a, int m) {
-        if (a == GLFW_PRESS) shortcut_callback(k, m);
+        shortcut_callback(k, m, a);
     });
 
     ASSERT(gl3wInit() != -1, "GL3W could not be initialized.");
@@ -62,7 +66,7 @@ int main(int argc, char *argv[])
 
     load_secondary_tileset("tiles.png");
     load_palettes("palettes");
-    load_tilemap("tamarok.bin");
+    load_tilemap_from_file("tamarok.bin");
 
     while (!glfwWindowShouldClose(window))
     {

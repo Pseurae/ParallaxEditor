@@ -13,13 +13,9 @@ enum Mask : short
     FlipY = 0x800
 };
 
-std::vector<Color> load_palette(const std::string &fname);
-void load_tilemap(const std::string &fname);
-void load_primary_tileset(const std::string &fname);
-void load_secondary_tileset(const std::string &fname);
-void load_palettes(const std::string &s);
-
 void open_tilemap(void);
+void save_tilemap(void);
+void save_as_tilemap(void);
 void open_primary_tileset(void);
 void open_secondary_tileset(void);
 void open_palettes(void);

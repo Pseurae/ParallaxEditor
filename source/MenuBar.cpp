@@ -13,6 +13,12 @@ void main_menu_bar(void)
             if (ImGui::MenuItem("Open Tilemap", "Ctrl+O"))
                 open_tilemap();
 
+            if (ImGui::MenuItem("Save Tilemap", "Ctrl+S"))
+                save_tilemap();
+            
+            if (ImGui::MenuItem("Save As Tilemap", "Ctrl+Shift+S"))
+                save_as_tilemap();
+
             if (ImGui::MenuItem("Open Primary Tileset", "Ctrl+Shift+1"))
                 open_primary_tileset();
 
