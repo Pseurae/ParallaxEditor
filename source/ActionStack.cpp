@@ -45,11 +45,11 @@ void action_stack_do_redo(void)
 
 static void action_place_tile_func(const Action &action, bool undo)
 {
-    PlaceTileAction ptAction = action.placeTile;
-    global.tilemap[ptAction.i] = undo ? ptAction.oldTile : ptAction.newTile;
+    // PlaceTileAction ptAction = action.placeTile;
+    // global.tilemap[ptAction.i] = undo ? ptAction.oldTile : ptAction.newTile;
 }
 
-Action action_place_tile_new(int i, unsigned short oldTile, unsigned short newTile)
+Action action_place_tile_new(int i, std::vector<unsigned short> oldTiles, std::vector<unsigned short> newTiles, unsigned int width, unsigned int height)
 {
-    return (Action){ .func = action_place_tile_func, .placeTile = { i, oldTile, newTile } };
+    return (Action){ .func = action_place_tile_func };
 }

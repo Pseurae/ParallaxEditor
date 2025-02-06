@@ -5,7 +5,11 @@
 
 struct Brush
 {
-    unsigned short tile;
+    std::vector<unsigned short> selection{0};
+    int width{1}, height{1};
+
+    bool fromTileset = true;
+
     unsigned char palette;
     bool xflip;
     bool yflip;

@@ -6,6 +6,7 @@
 
 struct Renderer final
 {
+    bool loadedPalettes = false;
     Palette palettes[16];
 
     unsigned int vertexArray;

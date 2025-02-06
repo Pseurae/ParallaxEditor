@@ -1,10 +1,6 @@
 #pragma once
 
-struct PlaceTileAction
-{
-    int i;
-    unsigned short oldTile, newTile;
-};
+#include <vector>
 
 struct Action;
 using ActionFunc = void(*)(const Action &, bool undo);
@@ -12,11 +8,6 @@ using ActionFunc = void(*)(const Action &, bool undo);
 struct Action
 {
     ActionFunc func;
-
-    union 
-    {
-        PlaceTileAction placeTile;
-    };
 };
 
 void action_stack_clear(void);
@@ -26,4 +17,4 @@ void action_stack_add_undo_action(Action action);
 void action_stack_do_undo(void);
 void action_stack_do_redo(void);
 
-Action action_place_tile_new(int i, unsigned short oldTile, unsigned short newTile);
+Action action_place_tile_new(int i, std::vector<unsigned short> oldTiles, std::vector<unsigned short> newTiles, unsigned int width, unsigned int height);

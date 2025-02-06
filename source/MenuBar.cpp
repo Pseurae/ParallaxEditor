@@ -47,8 +47,7 @@ void main_menu_bar(void)
 
         if (ImGui::BeginMenu("View"))
         {
-            if (ImGui::MenuItem("Show Screen Bounds", nullptr, &global.drawScreenBounds));
-            
+            ImGui::MenuItem("Show Screen Bounds", nullptr, &global.drawScreenBounds);            
             ImGui::EndMenu();
         }
 
