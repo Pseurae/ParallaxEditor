@@ -27,7 +27,7 @@ void action_stack_do_undo(void)
     Action action = sUndoStack.back();
     sUndoStack.pop_back();
 
-    action.func(action, true);
+    memcpy(global.tilemap, action.oldTiles, sizeof(global.tilemap));
     sRedoStack.push_back(action);
 }
 
@@ -39,17 +39,6 @@ void action_stack_do_redo(void)
     Action action = sRedoStack.back();
     sRedoStack.pop_back();
 
-    action.func(action, false);
+    memcpy(global.tilemap, action.newTiles, 32 * 32 * sizeof(unsigned short));
     sUndoStack.push_back(action);
-}
-
-static void action_place_tile_func(const Action &action, bool undo)
-{
-    // PlaceTileAction ptAction = action.placeTile;
-    // global.tilemap[ptAction.i] = undo ? ptAction.oldTile : ptAction.newTile;
-}
-
-Action action_place_tile_new(int i, std::vector<unsigned short> oldTiles, std::vector<unsigned short> newTiles, unsigned int width, unsigned int height)
-{
-    return (Action){ .func = action_place_tile_func };
 }

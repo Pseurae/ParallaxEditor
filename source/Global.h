@@ -13,6 +13,7 @@ struct Brush
     unsigned char palette;
     bool xflip;
     bool yflip;
+    bool scrollToSelected;
 };
 
 struct Global

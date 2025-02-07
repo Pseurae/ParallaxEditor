@@ -5,6 +5,14 @@
 
 #include "Global.h"
 
+template<class T>
+static inline void swap_val(T *v1, T *v2)
+{
+    T temp = *v1;
+    *v1 = *v2;
+    *v2 = temp;
+}
+
 static void tileset_selector(void)
 {
     auto drawList = ImGui::GetWindowDrawList();
@@ -26,9 +34,18 @@ static void tileset_selector(void)
     for (int i = 0; i < 1024; ++i)
     {
         int x = i % sTilesInRow, y = i / sTilesInRow;
+
         ImVec2 uv0 = ImVec2(i % 16, i / 16) * tilesize / size;
+        ImVec2 uv1 = uv0 + tilesize / size;
+
+        // if (global.brush.xflip)
+        //     swap_val(&uv0.x, &uv1.x);
+        
+        // if (global.brush.yflip)
+        //     swap_val(&uv0.y, &uv1.y);
+
         ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tilesize * scale;
-        drawList->AddImage(tex_id, pos, pos + tilesize * scale, uv0, uv0 + tilesize / size);
+        drawList->AddImage(tex_id, pos, pos + tilesize * scale, uv0, uv1);
 
         ImRect bb_ = ImRect(pos, pos + tilesize * scale);
         auto id_ = ImGui::GetCurrentContext()->CurrentWindow->GetIDFromRectangle(bb_);
@@ -85,11 +102,28 @@ static void tileset_selector(void)
     ImVec2 widgetsize = ImVec2(sTilesInRow, static_cast<int>(1024 / sTilesInRow)) * tilesize;
     ImRect bb(ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + widgetsize * scale + ImVec2(1.0f, 1.0f));
 
-    int x = sStartDrag % sTilesInRow, y = sStartDrag / sTilesInRow;
-    ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tilesize * scale;
     if (global.brush.fromTileset)
+    {
+        int x = sStartDrag % sTilesInRow, y = sStartDrag / sTilesInRow;
+        ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tilesize * scale;
         drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + ImVec2(sWidth, sHeight) * tilesize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+    }
 
+    if (global.brush.width == 1 && global.brush.height == 1)
+    {
+        int tile = global.brush.selection[0] & Mask::Index;
+        int x = tile % sTilesInRow, y = tile / sTilesInRow;
+        ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tilesize * scale;
+        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + tilesize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+    }
+
+    if (global.brush.scrollToSelected)
+    {
+        float posY = (global.brush.selection[0] / sTilesInRow) * tilesize.y * scale;
+        ImGui::SetScrollY(posY);
+    }
+
+    global.brush.scrollToSelected = false;
     ImGui::ItemSize(bb);
     ImGui::ItemAdd(bb, 0);
 }

@@ -7,7 +7,7 @@ using ActionFunc = void(*)(const Action &, bool undo);
 
 struct Action
 {
-    ActionFunc func;
+    unsigned short oldTiles[32 * 32], newTiles[32 * 32];
 };
 
 void action_stack_clear(void);
@@ -16,5 +16,3 @@ bool action_stack_can_redo(void);
 void action_stack_add_undo_action(Action action);
 void action_stack_do_undo(void);
 void action_stack_do_redo(void);
-
-Action action_place_tile_new(int i, std::vector<unsigned short> oldTiles, std::vector<unsigned short> newTiles, unsigned int width, unsigned int height);
