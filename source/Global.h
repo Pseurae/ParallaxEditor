@@ -1,31 +1,24 @@
 #pragma once
 
 #include <string>
-#include "Renderer.h"
+#include <memory>
+#include "Utils/Tilemap.h"
+#include "Core/Context.h"
+#include "Core/Popup.h"
+#include "Core/Renderer.h"
 
-struct Brush
-{
-    std::vector<unsigned short> selection{0};
-    int width{1}, height{1};
-
-    bool fromTileset = true;
-
-    unsigned char palette;
-    bool xflip;
-    bool yflip;
-    bool scrollToSelected;
-};
+using ContextList = std::list<std::unique_ptr<Context>>;
 
 struct Global
 {
     double dpiScale, zoomScale = 1.0f;
-    Brush brush;
-    Renderer renderer;
-
     bool drawScreenBounds = false;
 
-    std::string tilemapPath;
-    unsigned short tilemap[32 * 32];
+    ContextList contexts;
+    Context *currentContext = nullptr;
+
+    PopupManager popupManager;
+    Renderer renderer;
 };
 
 extern Global global;
