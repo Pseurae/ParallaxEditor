@@ -1,18 +1,57 @@
 #include <imgui.h>
 #include "Global.h"
-#include "Popups/NewTilemap.h"
+#include "UI/Helpers.h"
+#include "UI/Popups/NewTilemap.h"
+#include "UI/Popups/Palettes.h"
+#include "Utils/FileDialog.h"
 
-void main_menu_bar(void)
+void MainMenuBar(void)
 {
     if (ImGui::BeginMainMenuBar())
     {
-        if (ImGui::BeginMenu("Files"))
+        if (ImGui::BeginMenu("Tilemap"))
         {
             if (ImGui::MenuItem("New Tilemap"))
                 global.popupManager.Open<Popups::NewTilemap>();
 
+            if (ImGui::MenuItem("Open Tilemap"))
+                TryLoadTilemap();
+
+            if (ImGui::MenuItem("Save Tilemap"))
+                TrySaveTilemap();
+
             ImGui::EndMenu();
         }
+
+        if (ImGui::BeginMenu("Tileset"))
+        {
+            if (ImGui::MenuItem("Load Primary Tileset"))
+                TryLoadPrimaryTileset();
+
+            if (ImGui::MenuItem("Load Secondary Tileset"))
+                TryLoadSecondaryTileset();
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Palettes"))
+        {
+            if (ImGui::MenuItem("Change Palettes"))
+                global.popupManager.Open<Popups::Palettes>();
+            
+            if (ImGui::MenuItem("Unload All Palettes"))
+                UnloadAllPalettes();
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Edit"))
+        {
+            if (ImGui::MenuItem("Resize"))
+                ;
+            ImGui::EndMenu();
+        }
+
         ImGui::EndMainMenuBar();
     }
 }

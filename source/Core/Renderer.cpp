@@ -134,27 +134,23 @@ void Renderer::DrawTileset(void)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::DrawTilemap(const Tilemap &tmap)
+void Renderer::DrawTilemap(void)
 {
     if (mMapTex.tex.width == 0 || mMapTex.tex.height == 0)
         return;
-
-    BatchBackground(tmap.GetDefaultTile());
-    for (auto &tile : tmap.GetTiles())
-        BatchTile(tile);
 
     glBindFramebuffer(GL_FRAMEBUFFER, mMapTex.fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::Draw(const Tilemap &tmap)
+void Renderer::Draw(void)
 {
     if (!mRedrawFlag) 
         return;
 
     glBindVertexArray(mVAO);
     DrawTileset();
-    DrawTilemap(tmap);
+    DrawTilemap();
     FlushRender();
     mRedrawFlag = false;
 }
@@ -162,6 +158,11 @@ void Renderer::Draw(const Tilemap &tmap)
 void Renderer::LoadPalette(const Palette &palette, int slot)
 {
     LoadPalette(palette.GetColors().data(), slot);
+}
+
+void Renderer::ClearPalette(int slot)
+{
+    LoadPalette(sDefaultPalette, slot);
 }
 
 void Renderer::LoadPalette(const void *data, int slot)
@@ -187,26 +188,6 @@ void Renderer::LoadTexture(const std::string &fname, Texture &texture)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
-
-static constexpr unsigned char sDefaultPalette[] = 
-{
-    16 * 0, 16 * 0, 16 * 0,
-    16 * 1, 16 * 1, 16 * 2,
-    16 * 2, 16 * 2, 16 * 2,
-    16 * 3, 16 * 3, 16 * 3,
-    16 * 4, 16 * 4, 16 * 4,
-    16 * 5, 16 * 5, 16 * 5,
-    16 * 6, 16 * 6, 16 * 6,
-    16 * 7, 16 * 7, 16 * 7,
-    16 * 8, 16 * 8, 16 * 8,
-    16 * 9, 16 * 9, 16 * 9,
-    16 * 10, 16 * 10, 16 * 10,
-    16 * 11, 16 * 11, 16 * 11,
-    16 * 12, 16 * 12, 16 * 12,
-    16 * 13, 16 * 13, 16 * 13,
-    16 * 14, 16 * 14, 16 * 14,
-    16 * 15, 16 * 15, 16 * 15,
-};
 
 void Renderer::CreatePaletteTexture(void)
 {
@@ -283,9 +264,7 @@ void Renderer::BatchBackground(const Tile &tile)
     for (int y = 0; y < ytiles; ++y)
     for (int x = 0; x < xtiles; ++x)
     {
-        Tile t = tile;
-        t.x = x, t.y = y;
-        BatchTile(t);
+        BatchTile(tile);
     }
 }
 

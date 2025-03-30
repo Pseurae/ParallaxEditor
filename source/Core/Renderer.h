@@ -3,7 +3,6 @@
 #include <string>
 #include "Utils/Palette.h"
 #include "Utils/Tile.h"
-#include "Utils/Tilemap.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
@@ -30,9 +29,10 @@ public:
 
     void LoadPrimaryTileset(const std::string &fname);
     void LoadSecondaryTileset(const std::string &fname);
-    void Draw(const Tilemap &tmap);
+    void Draw(void);
 
     void LoadPalette(const Palette &palette, int slot);
+    void ClearPalette(int slot);
     const auto GetPickerPaletteNum() const { return mPickerPalNum; }
     void SetPickerPaletteNum(unsigned int palNum) { mPickerPalNum = palNum; mRedrawFlag = true; }
 
@@ -52,7 +52,7 @@ private:
     };
 
     void DrawTileset(void);
-    void DrawTilemap(const Tilemap &tmap);
+    void DrawTilemap(void);
 
     void InitializePicker(void);
     void InitializeMap(void);

@@ -63,8 +63,7 @@ int main(int argc, char *argv[])
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Renderer Call
-        if (global.currentContext)
-            global.renderer.Draw(global.currentContext->GetTilemap());
+        global.renderer.Draw();
 
         {
             ImGui_ImplOpenGL3_NewFrame();
@@ -81,7 +80,7 @@ int main(int argc, char *argv[])
                 MainWindow();
                 ImGui::End();
 
-                main_menu_bar();
+                MainMenuBar();
                 global.popupManager.DrawAndUpdate();
             }
 

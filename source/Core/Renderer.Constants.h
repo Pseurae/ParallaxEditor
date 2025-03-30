@@ -6,3 +6,4 @@ extern const char tilesetVertexShaderSource[];
 extern const char tilesetFragmentShaderSource[];
 extern const char mapVertexShaderSource[];
 extern const char mapFragmentShaderSource[];
+extern const unsigned char sDefaultPalette[];

@@ -13,8 +13,10 @@ add_executable(${PROJECT_NAME}
 
     source/UI/Popups/Error.cpp
     source/UI/Popups/NewTilemap.cpp
+    source/UI/Popups/Palettes.cpp
     source/UI/Popups/Prompt.cpp
 
+    source/UI/Helpers.cpp
     source/UI/MainWindow.cpp
     source/UI/MenuBar.cpp
     source/UI/TilemapPane.cpp
@@ -22,7 +24,6 @@ add_executable(${PROJECT_NAME}
 
     source/Utils/FileDialog.cpp
     source/Utils/Palette.cpp
-    source/Utils/Tilemap.cpp
 
     source/Global.cpp
     source/ParallaxEditor.cpp)

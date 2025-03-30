@@ -1,33 +1,47 @@
 #pragma once
 
 #include <string>
-#include "Utils/Tilemap.h"
+#include <unordered_map>
+#include <array>
 #include "Utils/Palette.h"
+#include "Utils/Tile.h"
 
 class Context final
 {
 public:
-    Context(const std::string &fname);
-    Context(unsigned short width, unsigned short height);
+    Context() = default;
 
-    void TrySave(void);
-    void SaveAs(const std::string &path);
+    void New(int width, int height);
+    void Load(const std::string &fname);
+    void Save(const std::string &path);
 
     void Import(const std::string &path);
     void Export(const std::string &path);
 
+    void Resize(int width, int height);
+
     const std::string GetName() const;
     inline bool &IsDirty() { return mDirty; }
 
-    Tilemap &GetTilemap(void) { return mTilemap; }
+    const std::string &GetPath() const { return mPath; }
+    auto &GetTiles(void) { return mTiles; }
+
+    auto &PalettePaths(void) { return mPalettePaths; }
+    auto &TilesetPaths(void) { return mTilesetPaths; }
+
+    bool IsLoaded(void) { return mLoaded; }
 
 private:
-    void Load(const std::string &fname);
-
     std::string mPath;
-    Palette mPalettes[16];
-    Tilemap mTilemap{0, 0};
-    std::string mTilesetPaths[2];
-    bool mIs8BPP;
+
+    unsigned short mWidth, mHeight;
+    Tile mDefaultTile;
+    std::unordered_map<TilePosition, Tile> mTiles;
+
+    std::array<std::string, 16> mPalettePaths;
+    std::array<std::string, 2> mTilesetPaths;
+
+    bool mIs8BPP = false;
     bool mDirty = false;
+    bool mLoaded = false;
 };

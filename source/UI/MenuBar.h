@@ -1,3 +1,3 @@
 #pragma once
 
-void main_menu_bar(void);
+void MainMenuBar(void);
