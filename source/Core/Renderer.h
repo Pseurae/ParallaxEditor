@@ -36,7 +36,7 @@ public:
     const auto GetPickerPaletteNum() const { return mPickerPalNum; }
     void SetPickerPaletteNum(unsigned int palNum) { mPickerPalNum = palNum; mRedrawFlag = true; }
 
-    void ResizeMapTexture(const ImVec2 &size);
+    void ResizeMapTexture(int width, int height);
     void Redraw(void) { mRedrawFlag = true; }
 
 private:

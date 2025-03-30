@@ -266,9 +266,9 @@ void Renderer::SpecifyRenderTargetSize(RenderTarget &target, int width, int heig
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Renderer::ResizeMapTexture(const ImVec2 &size)
+void Renderer::ResizeMapTexture(int width, int height)
 {
-    SpecifyRenderTargetSize(mMapTex, size.x * 8, size.y * 8);
+    SpecifyRenderTargetSize(mMapTex, width * 8, height * 8);
 }
 
 void Renderer::BatchTile(const Tile &tile)
