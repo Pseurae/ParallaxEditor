@@ -12,24 +12,20 @@ void TilesetSelector(void)
     bool mouseClicked = ImGui::IsMouseClicked(0);
     bool mouseReleased = ImGui::IsMouseReleased(0);
 
-    auto tilesetTex1 = global.renderer.GetPickerTex(0);
-
     static constexpr int tilesInRow = 16;
     static constexpr ImVec2 tileSize = ImVec2(8, 8);
     static float scale = 3.0f;
 
     for (int i = 0; i < 1024; ++i)
     {
-        auto tex = global.renderer.GetPickerTex(i >= 512 ? 1 : 0);
+        auto tex = global.renderer.GetPickerTex();
         if (tex.width == 0 || tex.height == 0)
             break;
-
-        auto rounded_i = i % 512;
 
         int x = i % tilesInRow, y = i / tilesInRow;
         int xtiles = (tex.width / 8);
 
-        ImVec2 uv0 = ImVec2(rounded_i % xtiles, rounded_i / xtiles) * tileSize / ImVec2(tex.width, tex.height);
+        ImVec2 uv0 = ImVec2(i % xtiles, i / xtiles) * tileSize / ImVec2(tex.width, tex.height);
         ImVec2 uv1 = uv0 + tileSize / ImVec2(tex.width, tex.height);
 
         ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tileSize * scale;

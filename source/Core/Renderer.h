@@ -14,7 +14,8 @@ class Renderer final
 public:
     struct Texture
     {
-        unsigned int width, height, id;
+        int width, height;
+        unsigned int id;
     };
 
     struct RenderTarget
@@ -26,8 +27,8 @@ public:
     void Initialize(void);
     void Shutdown(void);
 
-    const Texture &GetPickerTex(unsigned int i) const { return mPickerTexes[i].tex; }
-    const Texture &GetMapTex() const { return mMapTex.tex; }
+    const Texture &GetPickerTex(void) const { return mPickerTex.tex; }
+    const Texture &GetMapTex(void) const { return mMapTex.tex; }
 
     void LoadPrimaryTileset(const std::string &fname);
     void LoadSecondaryTileset(const std::string &fname);
@@ -35,7 +36,7 @@ public:
 
     void LoadPalette(const Palette &palette, int slot);
     void ClearPalette(int slot);
-    const auto GetPickerPaletteNum() const { return mPickerPalNum; }
+    const auto GetPickerPaletteNum(void) const { return mPickerPalNum; }
     void SetPickerPaletteNum(unsigned int palNum) { mPickerPalNum = palNum; mRedrawFlag = true; }
 
     void ResizeMapTexture(int width, int height);
@@ -60,7 +61,7 @@ private:
     void InitializeMap(void);
     void LoadPalette(const void *data, int slot);
     void CreatePaletteTexture(void);
-    void LoadTexture(const std::string &fname, Texture &);
+    void CreateTexture(unsigned int width, unsigned int height, Texture &);
 
     void GenerateTexture(Texture &);
     void GenerateRenderTarget(RenderTarget &target);
@@ -77,12 +78,11 @@ private:
     unsigned int mPickerVBO, mPickerEBO;
     unsigned int mMapVBO, mMapEBO;
     unsigned int mPickerShader, mMapShader;
-    Texture mPaletteTex, mTilesetTexes[2];
-    RenderTarget mPickerTexes[2], mMapTex;
+    Texture mPaletteTex, mTilesetTex;
+    RenderTarget mPickerTex, mMapTex;
 
-    ImVec2 mMapSize{0, 0};
     MapVertex mMapVertices[MaxVertices];
-    unsigned int mMapVertexCount = 0;
+    unsigned int mMapQuadCount = 0;
 
     int mPickerPalNum = 0;
     bool mRedrawFlag = true;

@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Core/Context.h"
 #include "Core/Renderer.Constants.h"
+#include "Renderer.h"
 
 unsigned int CreateShader(const char *v, const char *f);
 
@@ -15,8 +16,8 @@ void Renderer::Initialize(void)
     GenerateTexture(mPaletteTex);
     CreatePaletteTexture();
 
-    GenerateTexture(mTilesetTexes[0]);
-    GenerateTexture(mTilesetTexes[1]);
+    GenerateTexture(mTilesetTex);
+    CreateTexture(128, 512, mTilesetTex);
 
     InitializePicker();
     InitializeMap();
@@ -24,8 +25,8 @@ void Renderer::Initialize(void)
 
 void Renderer::InitializePicker(void)
 {
-    GenerateRenderTarget(mPickerTexes[0]);
-    GenerateRenderTarget(mPickerTexes[1]);
+    GenerateRenderTarget(mPickerTex);
+    SpecifyRenderTargetSize(mPickerTex, 128, 512);
 
     glGenBuffers(1, &mPickerVBO);
     glGenBuffers(1, &mPickerEBO);
@@ -75,27 +76,43 @@ void Renderer::Shutdown(void)
     glDeleteBuffers(1, &mPickerEBO);
 
     DeleteTexture(mPaletteTex);
-    DeleteTexture(mTilesetTexes[0]);
-    DeleteTexture(mTilesetTexes[1]);
+    DeleteTexture(mTilesetTex);
 
-    DeleteRenderTarget(mPickerTexes[0]);
-    DeleteRenderTarget(mPickerTexes[1]);
+    DeleteRenderTarget(mPickerTex);
     DeleteRenderTarget(mMapTex);
 
     glDeleteVertexArrays(1, &mVAO);
 }
 
+static unsigned char *LoadTilesetTexture(const std::string &fname)
+{
+    int width, height, channels;
+    stbi_set_flip_vertically_on_load(1);
+    unsigned char *data = stbi_load(fname.c_str(), &width, &height, &channels, 4);
+
+    if (width != 128 || height != 256 || data == nullptr)
+        return NULL;
+
+    return data;
+}
+
 void Renderer::LoadPrimaryTileset(const std::string &fname)
 {
-    LoadTexture(fname, mTilesetTexes[0]);
-    SpecifyRenderTargetSize(mPickerTexes[0], mTilesetTexes[0].width, mTilesetTexes[0].height);
+    unsigned char *data = LoadTilesetTexture(fname);
+
+    glBindTexture(GL_TEXTURE_2D, mTilesetTex.id);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 256, 128, 256, GL_RED, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
     mRedrawFlag = true;
 }
 
 void Renderer::LoadSecondaryTileset(const std::string &fname)
 {
-    LoadTexture(fname, mTilesetTexes[1]);
-    SpecifyRenderTargetSize(mPickerTexes[1], mTilesetTexes[1].width, mTilesetTexes[1].height);
+    unsigned char *data = LoadTilesetTexture(fname);
+
+    glBindTexture(GL_TEXTURE_2D, mTilesetTex.id);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 128, 256, GL_RED, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
     mRedrawFlag = true;
 }
 
@@ -114,23 +131,20 @@ void Renderer::DrawTileset(void)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    for (int i = 0; i < 2; ++i)
-    {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, mTilesetTexes[i].id);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, mTilesetTex.id);
 
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, mPaletteTex.id);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, mPaletteTex.id);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, mPickerTexes[i].fbo);
-        glViewport(0, 0, mPickerTexes[i].tex.width, mPickerTexes[i].tex.height);
+    glBindFramebuffer(GL_FRAMEBUFFER, mPickerTex.fbo);
+    glViewport(0, 0, mPickerTex.tex.width, mPickerTex.tex.height);
 
-        glClearColor(0.0, 0.0, 0.0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -175,20 +189,10 @@ void Renderer::LoadPalette(const void *data, int slot)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Renderer::LoadTexture(const std::string &fname, Texture &texture)
+void Renderer::CreateTexture(unsigned int width, unsigned int height, Texture &texture)
 {
-    int width, height, channels;
-    stbi_set_flip_vertically_on_load(1);
-    unsigned char *data = stbi_load(fname.c_str(), &width, &height, &channels, 4);
-
-    if ((width % 8) != 0 || (height % 8) != 0 || data == nullptr)
-        return;
-
-    texture.width = width;
-    texture.height = height;
-    
     glBindTexture(GL_TEXTURE_2D, texture.id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -255,6 +259,14 @@ void Renderer::ResizeMapTexture(int width, int height)
     SpecifyRenderTargetSize(mMapTex, width * 8, height * 8);
     mRedrawFlag = true;
 }
+
+static const ImVec2 sTransformVectors[4] =
+{
+    ImVec2(0.0f, 0.0f),
+    ImVec2(1.0f, 0.0f),
+    ImVec2(1.0f, 1.0f),
+    ImVec2(0.0f, 1.0f),
+};
 
 void Renderer::BatchTile(unsigned short x, unsigned short y, const Tile &tile)
 {
