@@ -3,6 +3,8 @@
 
 void Popup::Draw(void)
 {
+    this->PreDrawContent();
+
     if (ImGui::BeginPopupModal(mInternalName.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
     {
         this->DrawContent();

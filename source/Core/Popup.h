@@ -13,6 +13,7 @@ public:
     virtual ~Popup() = default;
 
     void Draw();
+    virtual void PreDrawContent() {}
     virtual void DrawContent() = 0;
 
     const auto &GetInternalName() const { return mInternalName; }

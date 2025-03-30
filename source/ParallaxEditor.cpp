@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Renderer Call
-        global.renderer.Draw();
+        global.renderer.Draw(global.context);
 
         {
             ImGui_ImplOpenGL3_NewFrame();

@@ -24,12 +24,17 @@ public:
     inline bool &IsDirty() { return mDirty; }
 
     const std::string &GetPath() const { return mPath; }
-    auto &GetTiles(void) { return mTiles; }
+    const auto &GetTiles(void) const { return mTiles; }
 
     auto &PalettePaths(void) { return mPalettePaths; }
     auto &TilesetPaths(void) { return mTilesetPaths; }
 
     bool IsLoaded(void) { return mLoaded; }
+
+    const unsigned short GetWidth() const { return mWidth; }
+    const unsigned short GetHeight() const { return mHeight; }
+
+    const Tile GetDefaultTile() const { return mDefaultTile; }
 
 private:
     std::string mPath;

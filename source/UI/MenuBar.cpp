@@ -17,7 +17,7 @@ void MainMenuBar(void)
             if (ImGui::MenuItem("Open Tilemap"))
                 TryLoadTilemap();
 
-            if (ImGui::MenuItem("Save Tilemap"))
+            if (ImGui::MenuItem("Save Tilemap", nullptr, nullptr, global.context.IsLoaded()))
                 TrySaveTilemap();
 
             ImGui::EndMenu();
@@ -25,10 +25,10 @@ void MainMenuBar(void)
 
         if (ImGui::BeginMenu("Tileset"))
         {
-            if (ImGui::MenuItem("Load Primary Tileset"))
+            if (ImGui::MenuItem("Load Primary Tileset", nullptr, nullptr, global.context.IsLoaded()))
                 TryLoadPrimaryTileset();
 
-            if (ImGui::MenuItem("Load Secondary Tileset"))
+            if (ImGui::MenuItem("Load Secondary Tileset", nullptr, nullptr, global.context.IsLoaded()))
                 TryLoadSecondaryTileset();
 
             ImGui::EndMenu();
@@ -36,10 +36,10 @@ void MainMenuBar(void)
 
         if (ImGui::BeginMenu("Palettes"))
         {
-            if (ImGui::MenuItem("Change Palettes"))
+            if (ImGui::MenuItem("Change Palettes", nullptr, nullptr, global.context.IsLoaded()))
                 global.popupManager.Open<Popups::Palettes>();
             
-            if (ImGui::MenuItem("Unload All Palettes"))
+            if (ImGui::MenuItem("Unload All Palettes", nullptr, nullptr, global.context.IsLoaded()))
                 UnloadAllPalettes();
 
             ImGui::EndMenu();
@@ -47,7 +47,7 @@ void MainMenuBar(void)
 
         if (ImGui::BeginMenu("Edit"))
         {
-            if (ImGui::MenuItem("Resize"))
+            if (ImGui::MenuItem("Resize", nullptr, nullptr, global.context.IsLoaded()))
                 ;
             ImGui::EndMenu();
         }

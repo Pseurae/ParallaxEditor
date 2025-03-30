@@ -7,6 +7,8 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
+class Context;
+
 class Renderer final
 {
 public:
@@ -29,7 +31,7 @@ public:
 
     void LoadPrimaryTileset(const std::string &fname);
     void LoadSecondaryTileset(const std::string &fname);
-    void Draw(void);
+    void Draw(const Context &ctx);
 
     void LoadPalette(const Palette &palette, int slot);
     void ClearPalette(int slot);
@@ -52,7 +54,7 @@ private:
     };
 
     void DrawTileset(void);
-    void DrawTilemap(void);
+    void DrawTilemap(const Context &ctx);
 
     void InitializePicker(void);
     void InitializeMap(void);
@@ -67,7 +69,7 @@ private:
     void DeleteRenderTarget(const RenderTarget &);
     void SpecifyRenderTargetSize(RenderTarget &, int, int);
 
-    void BatchTile(const Tile &tile);
+    void BatchTile(unsigned short x, unsigned short y, const Tile &tile);
     void BatchBackground(const Tile &tile);
     void FlushRender(void);
 

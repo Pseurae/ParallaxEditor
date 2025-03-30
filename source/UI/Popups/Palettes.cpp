@@ -3,6 +3,7 @@
 #include "Global.h"
 #include "UI/Helpers.h"
 #include "Utils/FileDialog.h"
+#include <filesystem>
 
 namespace Popups
 {
@@ -12,28 +13,24 @@ void Palettes::DrawContent()
 
     for (int i = 0; i < 16; ++i)
     {
-        ImGui::Text("%02d", i);
+        ImGui::Text("%2d", i);
         ImGui::SameLine();
 
-        ImGui::TextWrapped("%s", (palettePaths[i].empty() ? "Empty" : palettePaths[i].c_str()));
-
-        ImGui::SameLine();
+        ImGui::TextWrapped("%s", (palettePaths[i].empty() ? "Empty" : std::filesystem::path(palettePaths[i]).filename().string().c_str()));
+        ImGui::SameLine(350.0f);
 
         ImGui::PushID(i);
         if (ImGui::Button("Open"))
-        {
-            std::string s;
-
-            if (FileDialog::Open(FileDialog::Mode::Open, {{"Palette", "pal"}}, s))
-            {
-                global.context.PalettePaths()[i] = s;
-                global.renderer.LoadPalette(Palette(s), i);
-            }
-        }
+            OpenPalette(i);
         ImGui::PopID();
     }
 
     if (ImGui::Button("Close"))
         Close();
+    
+    ImGui::SameLine();
+
+    if (ImGui::Button("Open from Folder"))
+        OpenPaletteFolder();
 }
 }

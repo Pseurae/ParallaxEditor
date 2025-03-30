@@ -2,6 +2,7 @@
 #include <GL/gl3w.h>
 #include <stb_image.h>
 #include <iostream>
+#include "Core/Context.h"
 #include "Core/Renderer.Constants.h"
 
 unsigned int CreateShader(const char *v, const char *f);
@@ -134,23 +135,25 @@ void Renderer::DrawTileset(void)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::DrawTilemap(void)
+void Renderer::DrawTilemap(const Context &ctx)
 {
-    if (mMapTex.tex.width == 0 || mMapTex.tex.height == 0)
-        return;
-
     glBindFramebuffer(GL_FRAMEBUFFER, mMapTex.fbo);
+
+    BatchBackground(ctx.GetDefaultTile());
+    for (const auto &[pos, tile] : ctx.GetTiles())
+        BatchTile(pos.x, pos.y, tile);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::Draw(void)
+void Renderer::Draw(const Context &ctx)
 {
     if (!mRedrawFlag) 
         return;
 
     glBindVertexArray(mVAO);
     DrawTileset();
-    DrawTilemap();
+    DrawTilemap(ctx);
     FlushRender();
     mRedrawFlag = false;
 }
@@ -250,9 +253,10 @@ void Renderer::SpecifyRenderTargetSize(RenderTarget &target, int width, int heig
 void Renderer::ResizeMapTexture(int width, int height)
 {
     SpecifyRenderTargetSize(mMapTex, width * 8, height * 8);
+    mRedrawFlag = true;
 }
 
-void Renderer::BatchTile(const Tile &tile)
+void Renderer::BatchTile(unsigned short x, unsigned short y, const Tile &tile)
 {
 }
 
@@ -264,7 +268,7 @@ void Renderer::BatchBackground(const Tile &tile)
     for (int y = 0; y < ytiles; ++y)
     for (int x = 0; x < xtiles; ++x)
     {
-        BatchTile(tile);
+        BatchTile(x, y, tile);
     }
 }
 
