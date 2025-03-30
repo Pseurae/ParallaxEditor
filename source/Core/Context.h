@@ -19,6 +19,8 @@ public:
     const std::string GetName() const;
     inline bool &IsDirty() { return mDirty; }
 
+    Tilemap &GetTilemap(void) { return mTilemap; }
+
 private:
     void Load(const std::string &fname);
 

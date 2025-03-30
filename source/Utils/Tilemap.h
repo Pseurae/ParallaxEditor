@@ -11,10 +11,11 @@ public:
 
     auto &GetTiles() { return mTiles; } 
     const auto &GetTiles() const { return mTiles; } 
+    Tile GetDefaultTile() const { return mDefaultTile; }
 
 private:
     unsigned short mWidth, mHeight;
-    Tile mDefault;
+    Tile mDefaultTile;
     std::unordered_set<Tile> mTiles;
 };
 

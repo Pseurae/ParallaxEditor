@@ -4,7 +4,7 @@
 #include <iostream>
 #include "Core/Renderer.Constants.h"
 
-unsigned int create_shader(const char *v, const char *f);
+unsigned int CreateShader(const char *v, const char *f);
 
 void Renderer::Initialize(void)
 {
@@ -17,9 +17,14 @@ void Renderer::Initialize(void)
     GenerateTexture(mTilesetTexes[0]);
     GenerateTexture(mTilesetTexes[1]);
 
+    InitializePicker();
+    InitializeMap();
+}
+
+void Renderer::InitializePicker(void)
+{
     GenerateRenderTarget(mPickerTexes[0]);
     GenerateRenderTarget(mPickerTexes[1]);
-    GenerateRenderTarget(mMapTex);
 
     glGenBuffers(1, &mPickerVBO);
     glGenBuffers(1, &mPickerEBO);
@@ -30,7 +35,37 @@ void Renderer::Initialize(void)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mPickerEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 6, tilesetIndices, GL_STATIC_DRAW);
 
-    mPickerShader = create_shader(tilesetVertexShaderSource, tilesetFragmentShaderSource);
+    mPickerShader = CreateShader(tilesetVertexShaderSource, tilesetFragmentShaderSource);
+}
+
+void Renderer::InitializeMap(void)
+{
+    GenerateRenderTarget(mMapTex);
+
+    unsigned int quadIndices[MaxIndices];
+    {
+        unsigned int offset = 0;
+        for (unsigned int i = 0; i < MaxIndices; i += 6)
+        {
+            quadIndices[i + 0] = offset + 0;
+            quadIndices[i + 1] = offset + 1;
+            quadIndices[i + 2] = offset + 2;
+
+            quadIndices[i + 3] = offset + 2;
+            quadIndices[i + 4] = offset + 3;
+            quadIndices[i + 5] = offset + 0;
+
+            offset += 4;
+        }
+    }
+
+    glGenBuffers(1, &mMapVBO);
+    glGenBuffers(1, &mMapEBO);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mMapEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * MaxIndices, quadIndices, GL_STATIC_DRAW);
+
+    mMapShader = CreateShader(mapVertexShaderSource, mapFragmentShaderSource);
 }
 
 void Renderer::Shutdown(void)
@@ -99,17 +134,28 @@ void Renderer::DrawTileset(void)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::DrawTilemap(void)
-{}
+void Renderer::DrawTilemap(const Tilemap &tmap)
+{
+    if (mMapTex.tex.width == 0 || mMapTex.tex.height == 0)
+        return;
 
-void Renderer::Draw(void)
+    BatchBackground(tmap.GetDefaultTile());
+    for (auto &tile : tmap.GetTiles())
+        BatchTile(tile);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, mMapTex.fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::Draw(const Tilemap &tmap)
 {
     if (!mRedrawFlag) 
         return;
 
     glBindVertexArray(mVAO);
     DrawTileset();
-    DrawTilemap();
+    DrawTilemap(tmap);
+    FlushRender();
     mRedrawFlag = false;
 }
 
@@ -220,7 +266,33 @@ void Renderer::SpecifyRenderTargetSize(RenderTarget &target, int width, int heig
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-unsigned int create_shader(const char *v, const char *f)
+void Renderer::ResizeMapTexture(const ImVec2 &size)
+{
+    SpecifyRenderTargetSize(mMapTex, size.x * 8, size.y * 8);
+}
+
+void Renderer::BatchTile(const Tile &tile)
+{
+}
+
+void Renderer::BatchBackground(const Tile &tile)
+{
+    int xtiles = mMapTex.tex.width / 8, 
+        ytiles = mMapTex.tex.height / 8;
+
+    for (int y = 0; y < ytiles; ++y)
+    for (int x = 0; x < xtiles; ++x)
+    {
+        Tile t = tile;
+        t.x = x, t.y = y;
+        BatchTile(t);
+    }
+}
+
+void Renderer::FlushRender(void)
+{}
+
+unsigned int CreateShader(const char *v, const char *f)
 {
     unsigned int vertexShader, fragmentShader, geometryShader;
     int success;
