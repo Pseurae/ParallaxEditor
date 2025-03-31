@@ -10,7 +10,7 @@ public:
     Error(const std::string &message) : Popup("Error"), mMessage(message)
     {}
 
-    void DrawContent() override;
+    void DrawContent(void) override;
 
 private:
     std::string mMessage;

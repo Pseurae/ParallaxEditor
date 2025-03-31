@@ -13,13 +13,13 @@ public:
     virtual ~Popup() = default;
 
     void Draw();
-    virtual void PreDrawContent() {}
-    virtual void DrawContent() = 0;
+    virtual void PreDrawContent(void) {}
+    virtual void DrawContent(void) = 0;
 
-    const auto &GetInternalName() const { return mInternalName; }
-    bool ShouldClose() { return mShouldClose; }
+    const auto &GetInternalName(void) const { return mInternalName; }
+    bool ShouldClose(void) { return mShouldClose; }
 
-    void Close() { mShouldClose = true; }
+    void Close(void) { mShouldClose = true; }
 
 private:
     std::string mInternalName;

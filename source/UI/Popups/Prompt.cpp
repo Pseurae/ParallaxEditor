@@ -3,7 +3,7 @@
 
 namespace Popups
 {
-void Prompt::DrawContent()
+void Prompt::DrawContent(void)
 {
     ImGui::Text("%s", mMessage.c_str());
 

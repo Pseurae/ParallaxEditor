@@ -3,6 +3,7 @@
 #include "Utils/FileDialog.h"
 #include "Helpers.h"
 #include <filesystem>
+#include <fstream>
 
 void CreateNewTilemap(int width, int height)
 {
@@ -26,6 +27,36 @@ void TrySaveTilemap(void)
     std::string p;
     if (FileDialog::Open(FileDialog::Mode::Save, {{ "Tilemap", "toml" }}, p))
         global.context.Save(p);
+}
+
+std::vector<Tile> LoadBinaryTilemap(const std::string &path)
+{
+    std::vector<Tile> tiles{};
+    std::ifstream fs(path, std::ios::binary);
+
+    while (true)
+    {
+        unsigned short tileEntry;
+        fs.read(reinterpret_cast<char *>(&tileEntry), 2);
+
+        if (fs.eof())
+            break;
+
+        tiles.push_back(Tile{
+            (tileEntry & 0x400) == 0x400,
+            (tileEntry & 0x800) == 0x800,
+            (unsigned short)(tileEntry & 0x3FF),
+            (unsigned char)((tileEntry >> 12) & 0xF)
+        });
+    };
+
+    fs.close();
+    return tiles;
+}
+
+void TryImportTilemap(const std::vector<Tile> &tiles, int width)
+{
+    global.context.Import(tiles, width, tiles.size() / width);
 }
 
 void TryExportTilemap(void)

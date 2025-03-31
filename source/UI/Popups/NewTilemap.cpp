@@ -5,7 +5,7 @@
 
 namespace Popups
 {
-void NewTilemap::DrawContent()
+void NewTilemap::DrawContent(void)
 {
     if (ImGui::InputInt("Width", &mWidth))
         mWidth = std::max(0, mWidth);

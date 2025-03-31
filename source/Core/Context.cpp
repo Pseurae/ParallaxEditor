@@ -88,21 +88,14 @@ void Context::Save(const std::string &path)
     fs.close();
 }
 
-void Context::Import(const std::string &path)
+void Context::Import(const std::vector<Tile> &tiles, int width, int height)
 {}
-
-enum Mask : short
-{
-    Index = 0x3FF,
-    FlipX = 0x400,
-    FlipY = 0x800
-};
 
 static inline unsigned short ConvertTileToPalette(const Tile &tile)
 {
-    return tile.id & Mask::Index |
-        (tile.xflip ? Mask::FlipX : 0) |
-        (tile.yflip ? Mask::FlipY : 0) |
+    return tile.id & 0x3FF |
+        (tile.xflip ? 0x400 : 0) |
+        (tile.yflip ? 0x800 : 0) |
         (tile.palette & 0xF);
 }
 

@@ -7,7 +7,7 @@
 
 namespace Popups
 {
-void Palettes::DrawContent()
+void Palettes::DrawContent(void)
 {
     auto palettePaths = global.context.PalettePaths();
 

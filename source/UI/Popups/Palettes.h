@@ -10,7 +10,7 @@ public:
     Palettes() : Popup("Palettes")
     {}
 
-    void DrawContent() override;
+    void DrawContent(void) override;
 private:
 };
 }

@@ -12,6 +12,7 @@ add_executable(${PROJECT_NAME}
     source/Core/Renderer.cpp
 
     source/UI/Popups/Error.cpp
+    source/UI/Popups/ImportTilemap.cpp
     source/UI/Popups/NewTilemap.cpp
     source/UI/Popups/Palettes.cpp
     source/UI/Popups/Prompt.cpp

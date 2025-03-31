@@ -3,7 +3,7 @@
 
 namespace Popups
 {
-void Error::DrawContent()
+void Error::DrawContent(void)
 {
     ImGui::Text("%s", mMessage.c_str());
 
