@@ -57,6 +57,7 @@ std::vector<Tile> LoadBinaryTilemap(const std::string &path)
 void TryImportTilemap(const std::vector<Tile> &tiles, int width)
 {
     global.context.Import(tiles, width, tiles.size() / width);
+    global.renderer.ResizeMapTexture(width, tiles.size() / width);
 }
 
 void TryExportTilemap(void)

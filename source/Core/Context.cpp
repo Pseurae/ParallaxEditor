@@ -89,7 +89,19 @@ void Context::Save(const std::string &path)
 }
 
 void Context::Import(const std::vector<Tile> &tiles, int width, int height)
-{}
+{
+    mWidth = width;
+    mHeight = height;
+
+    mTiles.clear();
+    for (unsigned int y = 0; y < height; ++y)
+    for (unsigned int x = 0; x < width; ++x)
+    {
+        mTiles[TilePosition{x, y}] = tiles[x + y * width];
+    }
+
+    mLoaded = true;
+}
 
 static inline unsigned short ConvertTileToPalette(const Tile &tile)
 {
