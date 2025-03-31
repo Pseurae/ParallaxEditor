@@ -145,18 +145,44 @@ void Renderer::DrawTileset(void)
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::DrawTilemap(const Context &ctx)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, mMapTex.fbo);
-
     BatchBackground(ctx.GetDefaultTile());
     for (const auto &[pos, tile] : ctx.GetTiles())
         BatchTile(pos.x, pos.y, tile);
 
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mMapEBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mMapVBO);
+    glBufferData(GL_ARRAY_BUFFER, mMapQuadCount * 4 * sizeof(MapVertex), mMapVertices, GL_STREAM_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(MapVertex), (void *)offsetof(MapVertex, pos));
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(MapVertex), (void *)offsetof(MapVertex, uv));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(MapVertex), (void *)offsetof(MapVertex, palette));
+    glEnableVertexAttribArray(2);
+
+    glUseProgram(mMapShader);
+
+    glUniform1i(glGetUniformLocation(mMapShader, "texture1"), 0);
+    glUniform1i(glGetUniformLocation(mMapShader, "texture2"), 1);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, mTilesetTex.id);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, mPaletteTex.id);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, mMapTex.fbo);
+    glViewport(0, 0, mMapTex.tex.width, mMapTex.tex.height);
+
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glDrawElements(GL_TRIANGLES, mMapQuadCount * 6, GL_UNSIGNED_INT, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -168,7 +194,6 @@ void Renderer::Draw(const Context &ctx)
     glBindVertexArray(mVAO);
     DrawTileset();
     DrawTilemap(ctx);
-    FlushRender();
     mRedrawFlag = false;
 }
 
@@ -245,10 +270,15 @@ void Renderer::DeleteRenderTarget(const RenderTarget &target)
 
 void Renderer::SpecifyRenderTargetSize(RenderTarget &target, int width, int height)
 {
-    glBindTexture(GL_TEXTURE_2D, target.tex.id);
-
     target.tex.width = width;
     target.tex.height = height;
+
+    glBindTexture(GL_TEXTURE_2D, target.tex.id);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -268,8 +298,60 @@ static const ImVec2 sTransformVectors[4] =
     ImVec2(0.0f, 1.0f),
 };
 
+template<class T>
+static inline void swap_val(T *v1, T *v2)
+{
+    T temp = *v1;
+    *v1 = *v2;
+    *v2 = temp;
+}
+
 void Renderer::BatchTile(unsigned short x, unsigned short y, const Tile &tile)
 {
+    auto mapSize = ImVec2(mMapTex.tex.width, mMapTex.tex.height);
+    ImVec2 texCoords[4];
+    {
+        auto tileDim = ImVec2(128.0f, 512.0f);
+
+        unsigned int x = tile.id % 16;
+        unsigned int y = tile.id / 16;
+
+        texCoords[0] = ImVec2(x, y); // Top-left
+        texCoords[1] = ImVec2(x + 1, y); // Top-right
+        texCoords[2] = ImVec2(x + 1, y + 1); // Bottom-right
+        texCoords[3] = ImVec2(x, y + 1); // Bottom-left
+
+        if (tile.xflip)
+        {
+            swap_val(&texCoords[0].x, &texCoords[1].x);
+            swap_val(&texCoords[2].x, &texCoords[3].x);
+        }
+
+        if (tile.yflip)
+        {
+            swap_val(&texCoords[1].y, &texCoords[2].y);
+            swap_val(&texCoords[0].y, &texCoords[3].y);
+        }
+
+        texCoords[0] /= tileDim / 8.0f;
+        texCoords[1] /= tileDim / 8.0f;
+        texCoords[2] /= tileDim / 8.0f;
+        texCoords[3] /= tileDim / 8.0f;
+
+        // invert y axis
+        texCoords[0].y = 1.0 - texCoords[0].y;
+        texCoords[1].y = 1.0 - texCoords[1].y;
+        texCoords[2].y = 1.0 - texCoords[2].y;
+        texCoords[3].y = 1.0 - texCoords[3].y;
+    }
+
+    for (int i = 0; i < 4; ++i)
+    {
+        mMapVertices[i + mMapQuadCount * 4].pos = ((ImVec2(x, y) + sTransformVectors[i]) * 8.0f) /  mapSize;
+        mMapVertices[i + mMapQuadCount * 4].uv = texCoords[i];
+        mMapVertices[i + mMapQuadCount * 4].palette = tile.palette;
+    }
+    mMapQuadCount++;
 }
 
 void Renderer::BatchBackground(const Tile &tile)
@@ -283,9 +365,6 @@ void Renderer::BatchBackground(const Tile &tile)
         BatchTile(x, y, tile);
     }
 }
-
-void Renderer::FlushRender(void)
-{}
 
 unsigned int CreateShader(const char *v, const char *f)
 {

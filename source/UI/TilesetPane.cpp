@@ -14,7 +14,7 @@ void TilesetSelector(void)
 
     static constexpr int tilesInRow = 16;
     static constexpr ImVec2 tileSize = ImVec2(8, 8);
-    static float scale = 3.0f;
+    static constexpr float scale = 3.0f;
 
     for (int i = 0; i < 1024; ++i)
     {

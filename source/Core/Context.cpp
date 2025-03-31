@@ -9,7 +9,6 @@ void Context::New(int width, int height)
 {
     mWidth = width;
     mHeight = height;
-
     mLoaded = true;
 }
 

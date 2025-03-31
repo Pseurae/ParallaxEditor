@@ -50,6 +50,7 @@ void UnloadAllPalettes(void)
 {
     for (int i = 0; i < 16; ++i)
         global.renderer.ClearPalette(i);
+    global.renderer.Redraw();
 }
 
 void OpenPalette(unsigned int slot)

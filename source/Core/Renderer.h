@@ -72,7 +72,6 @@ private:
 
     void BatchTile(unsigned short x, unsigned short y, const Tile &tile);
     void BatchBackground(const Tile &tile);
-    void FlushRender(void);
 
     unsigned int mVAO;
     unsigned int mPickerVBO, mPickerEBO;

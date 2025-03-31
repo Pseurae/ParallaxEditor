@@ -8,7 +8,7 @@ void TilemapPane(void)
     if (ImGui::BeginChild("Tilemap", ImVec2(0.0f, 0.0f), 0, ImGuiWindowFlags_HorizontalScrollbar))
     {
         auto &tex = global.renderer.GetMapTex();
-        ImGui::Image(tex.id, ImVec2(tex.width, tex.height));
+        ImGui::Image(tex.id, ImVec2(tex.width * 3, tex.height * 3));
         ImGui::EndChild();
     }
 }
