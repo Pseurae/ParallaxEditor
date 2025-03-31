@@ -5,23 +5,30 @@
 #include "Global.h"
 #include <iostream>
 
+static void LeftClick(unsigned int x, unsigned int y)
+{
+    auto &brush = global.brush;
+    global.context.AddTile({x, y}, {brush.xflip, brush.yflip, (unsigned short)brush.tile, global.renderer.GetPickerPaletteNum()});
+    global.renderer.Redraw();
+}
+
 static void TilemapWindow(void)
 {
     auto drawList = ImGui::GetWindowDrawList();
 
-    bool mouseDown = ImGui::IsMouseDown(0);
-    bool mouseClicked = ImGui::IsMouseClicked(0);
-    bool mouseReleased = ImGui::IsMouseReleased(0);
-
     auto tex = global.renderer.GetMapTex();
     auto &tiles = global.context.GetTiles();
 
-    int xtiles = tex.width / 8, 
-        ytiles = tex.height / 8;
-    
+    int xtiles = global.context.GetWidth(), 
+        ytiles = global.context.GetHeight();
+
     static constexpr ImVec2 tileSize = ImVec2(8, 8);
-    static constexpr float scale = 3.0f;
+    float scale = 4.0f * global.zoomScale;
+
     ImVec2 size = ImVec2(tex.width, tex.height);
+
+    bool hasHovered = false;
+    ImVec2 hoveredPos = ImVec2(0, 0);
 
     for (unsigned int y = 0; y < ytiles; ++y)
     for (unsigned int x = 0; x < xtiles; ++x)
@@ -32,13 +39,20 @@ static void TilemapWindow(void)
 
         ImRect bb_ = ImRect(pos, pos + tileSize * scale);
         bool hovered = ImGui::ItemHoverable(bb_, ImGui::GetCurrentContext()->CurrentWindow->GetIDFromRectangle(bb_), ImGuiItemFlags_AllowOverlap);
-
-        if (hovered && mouseClicked)
+        if (hovered)
         {
-            auto &brush = global.brush;
-            global.context.AddTile({x, y}, {brush.xflip, brush.yflip, (unsigned short)brush.tile, global.renderer.GetPickerPaletteNum()});
-            global.renderer.Redraw();
+            hasHovered = true;
+            hoveredPos = ImVec2(x, y);
         }
+    }
+
+    if (hasHovered)
+    {
+        if (ImGui::IsMouseDown(0))
+            LeftClick(hoveredPos.x, hoveredPos.y);
+
+        ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + hoveredPos * tileSize * scale;
+        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
     }
 }
 

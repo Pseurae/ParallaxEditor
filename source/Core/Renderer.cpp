@@ -191,6 +191,7 @@ void Renderer::Draw(const Context &ctx)
     if (!mRedrawFlag) 
         return;
 
+    mMapQuadCount = 0;
     glBindVertexArray(mVAO);
     DrawTileset();
     DrawTilemap(ctx);

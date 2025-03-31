@@ -7,10 +7,6 @@
 void TilesetSelector(void)
 {
     auto drawList = ImGui::GetWindowDrawList();
-
-    bool mouseDown = ImGui::IsMouseDown(0);
-    bool mouseClicked = ImGui::IsMouseClicked(0);
-    bool mouseReleased = ImGui::IsMouseReleased(0);
     auto tex = global.renderer.GetPickerTex();
 
     static constexpr int tilesInRow = 16;
@@ -32,7 +28,7 @@ void TilesetSelector(void)
         auto id_ = ImGui::GetCurrentContext()->CurrentWindow->GetIDFromRectangle(bb_);
         bool hovered = ImGui::ItemHoverable(bb_, id_, 0);
 
-        if (hovered && mouseClicked)
+        if (hovered && ImGui::IsMouseClicked(0))
             global.brush.tile = i;
     }
 

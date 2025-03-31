@@ -136,6 +136,8 @@ const std::string Context::GetName() const
     return mPath.empty() ? "Untitled" : std::filesystem::path(mPath).filename().string();
 }
 
+#include <iostream>
+
 void Context::AddTile(const TilePosition &pos, const Tile &tile)
 {
     mTiles[pos] = tile;
