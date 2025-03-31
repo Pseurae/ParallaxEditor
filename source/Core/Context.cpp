@@ -9,17 +9,17 @@ void Context::New(int width, int height)
 {
     mWidth = width;
     mHeight = height;
+    mTiles.clear();
     mLoaded = true;
 }
 
 void Context::Load(const std::string &fname)
 {
-    mTiles.clear();
-
     auto tbl = toml::parse_file(fname);
 
-    auto width = tbl["width"].value<int>();
-    auto height = tbl["height"].value<int>();
+    mWidth = tbl["width"].value_or(32);
+    mHeight = tbl["height"].value_or(32);
+
     auto defaultTile = tbl["default_tile"];
 
     auto readTile = +[](const toml::table &tbl) {
@@ -39,6 +39,7 @@ void Context::Load(const std::string &fname)
 
     if (toml::array *tileArray = tiles.as_array())
     {
+        mTiles.clear();
         tileArray->for_each([readTile, this](auto &&i) {
             if (auto tbl = i.as_table())
             {
@@ -51,9 +52,6 @@ void Context::Load(const std::string &fname)
             }
         });
     }
-
-    auto palettes = tbl["palettes"];
-    auto tilesets = tbl["tilesets"];
 
     mLoaded = true;
 }
@@ -85,45 +83,42 @@ void Context::Save(const std::string &path)
     }
     tbl.emplace("tiles", tilesArray);
 
-    toml::array palettesArray;
-    for (int i = 0; i < mPalettePaths.size(); ++i)
-    {
-        const auto &path = mPalettePaths[i];
-        if (path.empty()) continue;
-
-        palettesArray.push_back(toml::table{
-            {"slot", i},
-            {"path", path}
-        });
-    }
-
-    tbl.emplace("palettes", palettesArray);
-
-    toml::array tilesetArray;
-    for (int i = 0; i < mTilesetPaths.size(); ++i)
-    {
-        const auto &path = mTilesetPaths[i];
-        if (path.empty()) continue;
-
-        tilesetArray.push_back(toml::table{
-            { "slot", i },
-            { "path", path }
-        });
-    }
-
-    tbl.emplace("tilesets", tilesetArray);
-
-    mPath = path;
-    std::ofstream f(path);
-    f << tbl;
-    f.close();
+    std::ofstream fs(path);
+    fs << tbl;
+    fs.close();
 }
 
 void Context::Import(const std::string &path)
 {}
 
+enum Mask : short
+{
+    Index = 0x3FF,
+    FlipX = 0x400,
+    FlipY = 0x800
+};
+
+static inline unsigned short ConvertTileToPalette(const Tile &tile)
+{
+    return tile.id & Mask::Index |
+        (tile.xflip ? Mask::FlipX : 0) |
+        (tile.yflip ? Mask::FlipY : 0) |
+        (tile.palette & 0xF);
+}
+
 void Context::Export(const std::string &path)
-{}
+{
+    std::ofstream fs(path);
+    for (unsigned int y = 0; y < mHeight; ++y)
+    for (unsigned int x = 0; x < mWidth; ++x)
+    {
+        const auto &tile = mTiles.contains({ x, y }) ? mTiles.at({ x, y }) : mDefaultTile;
+        unsigned short bytes = ConvertTileToPalette(tile);
+
+        fs.write(reinterpret_cast<char *>(&bytes), 2);
+    }
+    fs.close();
+}
 
 void Context::Resize(int width, int height)
 {
@@ -135,8 +130,6 @@ const std::string Context::GetName() const
 {
     return mPath.empty() ? "Untitled" : std::filesystem::path(mPath).filename().string();
 }
-
-#include <iostream>
 
 void Context::AddTile(const TilePosition &pos, const Tile &tile)
 {

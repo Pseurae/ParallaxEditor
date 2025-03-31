@@ -20,6 +20,11 @@ void MainMenuBar(void)
             if (ImGui::MenuItem("Save Tilemap", nullptr, nullptr, global.context.IsLoaded()))
                 TrySaveTilemap();
 
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Export Tilemap", nullptr, nullptr, global.context.IsLoaded()))
+                TryExportTilemap();
+
             ImGui::EndMenu();
         }
 

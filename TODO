@@ -1,3 +1,6 @@
-[ ] Create variable sized tilemaps
-[ ] Allow single palette choosing
-[ ] Differentiate map/normal tilemaps (Allow custom tilemap format)
+[X] Create variable sized tilemaps
+[X] Allow single palette choosing
+[X] ~~Differentiate map/normal tilemaps~~ (Allow custom tilemap format)
+[ ] Overlay and underlay images
+[ ] Way to control opacity
+[ ] Proper custom tilemap format

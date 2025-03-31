@@ -21,7 +21,6 @@ static void TilemapWindow(void)
     auto drawList = ImGui::GetWindowDrawList();
 
     auto tex = global.renderer.GetMapTex();
-    auto &tiles = global.context.GetTiles();
 
     int xtiles = global.context.GetWidth(), 
         ytiles = global.context.GetHeight();

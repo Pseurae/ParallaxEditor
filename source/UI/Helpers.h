@@ -3,6 +3,7 @@
 void CreateNewTilemap(int, int);
 void TryLoadTilemap(void);
 void TrySaveTilemap(void);
+void TryExportTilemap(void);
 void TryLoadPrimaryTileset(void);
 void TryLoadSecondaryTileset(void);
 void UnloadAllPalettes(void);

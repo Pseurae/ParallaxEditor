@@ -14,16 +14,25 @@ void TryLoadTilemap(void)
 {
     std::string s;
     if (FileDialog::Open(FileDialog::Mode::Open, {{"Tilemap", "toml"}}, s))
+    {
         global.context.Load(s);
+        global.renderer.ResizeMapTexture(global.context.GetWidth(), global.context.GetHeight());
+        global.renderer.Redraw();
+    }
 }
 
 void TrySaveTilemap(void)
 {
     std::string p;
     if (FileDialog::Open(FileDialog::Mode::Save, {{ "Tilemap", "toml" }}, p))
-    {
         global.context.Save(p);
-    }
+}
+
+void TryExportTilemap(void)
+{
+    std::string p;
+    if (FileDialog::Open(FileDialog::Mode::Save, {{ "Tilemap", "bin" }}, p))
+        global.context.Export(p);
 }
 
 void TryLoadPrimaryTileset(void)
