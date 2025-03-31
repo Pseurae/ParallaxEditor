@@ -36,6 +36,8 @@ public:
 
     const Tile GetDefaultTile() const { return mDefaultTile; }
 
+    void AddTile(const TilePosition &pos, const Tile &tile);
+
 private:
     std::string mPath;
 

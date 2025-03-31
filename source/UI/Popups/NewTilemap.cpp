@@ -7,8 +7,11 @@ namespace Popups
 {
 void NewTilemap::DrawContent()
 {
-    ImGui::InputInt("Width", &mWidth);
-    ImGui::InputInt("Height", &mHeight);
+    if (ImGui::InputInt("Width", &mWidth))
+        mWidth = std::max(0, mWidth);
+
+    if (ImGui::InputInt("Height", &mHeight))
+        mWidth = std::max(0, mHeight);
 
     if (ImGui::Button("Ok"))
     {

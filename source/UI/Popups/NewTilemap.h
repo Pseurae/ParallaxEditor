@@ -12,5 +12,6 @@ public:
     void DrawContent() override;
 private:
     int mWidth = 32, mHeight = 32;
+    int mDefaultTile = 0;
 };
 }

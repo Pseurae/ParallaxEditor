@@ -5,6 +5,7 @@
 #include "Core/Context.h"
 #include "Core/Popup.h"
 #include "Core/Renderer.h"
+#include "Core/Brush.h"
 
 using ContextList = std::list<std::unique_ptr<Context>>;
 
@@ -17,6 +18,7 @@ struct Global
 
     PopupManager popupManager;
     Renderer renderer;
+    Brush brush;
 };
 
 extern Global global;

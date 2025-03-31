@@ -37,7 +37,7 @@ public:
     void LoadPalette(const Palette &palette, int slot);
     void ClearPalette(int slot);
     const auto GetPickerPaletteNum(void) const { return mPickerPalNum; }
-    void SetPickerPaletteNum(unsigned int palNum) { mPickerPalNum = palNum; mRedrawFlag = true; }
+    void SetPickerPaletteNum(unsigned char palNum) { mPickerPalNum = palNum; mRedrawFlag = true; }
 
     void ResizeMapTexture(int width, int height);
     void Redraw(void) { mRedrawFlag = true; }
@@ -83,6 +83,6 @@ private:
     MapVertex mMapVertices[MaxVertices];
     unsigned int mMapQuadCount = 0;
 
-    int mPickerPalNum = 0;
+    unsigned char mPickerPalNum = 0;
     bool mRedrawFlag = true;
 };
