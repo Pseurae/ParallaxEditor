@@ -5,10 +5,14 @@
 #include "Global.h"
 #include <iostream>
 
-static void LeftClick(unsigned int x, unsigned int y)
+static void ApplyTiles(unsigned int startX, unsigned int startY)
 {
     auto &brush = global.brush;
-    global.context.AddTile({x, y}, {brush.xflip, brush.yflip, (unsigned short)brush.tile, global.renderer.GetPickerPaletteNum()});
+
+    for (unsigned int y = 0; y < brush.height; ++y)
+    for (unsigned int x = 0; x < brush.width; ++x)
+        global.context.AddTile({x + startX, y + startY}, brush.selection[x + y * brush.width]);
+
     global.renderer.Redraw();
 }
 
@@ -49,10 +53,10 @@ static void TilemapWindow(void)
     if (hasHovered)
     {
         if (ImGui::IsMouseDown(0))
-            LeftClick(hoveredPos.x, hoveredPos.y);
+            ApplyTiles(hoveredPos.x, hoveredPos.y);
 
         ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + hoveredPos * tileSize * scale;
-        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + ImVec2(global.brush.width, global.brush.height) * tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
     }
 }
 

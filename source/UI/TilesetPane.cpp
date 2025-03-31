@@ -8,10 +8,19 @@ void TilesetSelector(void)
 {
     auto drawList = ImGui::GetWindowDrawList();
     auto tex = global.renderer.GetPickerTex();
+    auto &brush = global.brush;
+
+    bool mouseDown = ImGui::IsMouseDown(0);
+    bool mouseClicked = ImGui::IsMouseClicked(0);
+    bool mouseReleased = ImGui::IsMouseReleased(0);
 
     static constexpr int tilesInRow = 16;
     static constexpr ImVec2 tileSize = ImVec2(8, 8);
     static constexpr float scale = 3.0f;
+
+    bool hasHovered = false;
+    static int sStartDrag = 0;
+    static int sBrushWidth = 0, sBrushHeight = 0;
 
     for (int i = 0; i < 1024; ++i)
     {
@@ -28,18 +37,54 @@ void TilesetSelector(void)
         auto id_ = ImGui::GetCurrentContext()->CurrentWindow->GetIDFromRectangle(bb_);
         bool hovered = ImGui::ItemHoverable(bb_, id_, 0);
 
-        if (hovered && ImGui::IsMouseClicked(0))
-            global.brush.tile = i;
+        if (hovered)
+        {
+            if (mouseClicked)
+                sStartDrag = i;
+
+            hasHovered = true;
+        }
+    }
+
+    if (hasHovered)
+    {
+        if (mouseDown)
+        {
+            auto delta = ImGui::GetMouseDragDelta();
+            sBrushWidth = std::max<int>(std::abs(delta.x) / (tileSize.x * scale), 0) + 1;
+            sBrushHeight = std::max<int>(std::abs(delta.y) / (tileSize.y * scale), 0) + 1;
+        }
+
+        if (mouseReleased)
+        {
+            brush.width = sBrushWidth;
+            brush.height = sBrushHeight;
+
+            brush.selection.resize(sBrushWidth * sBrushHeight);
+
+            for (int y = 0; y < sBrushHeight; ++y)
+            for (int x = 0; x < sBrushWidth; ++x)
+            {
+                int startX = sStartDrag % tilesInRow, 
+                    startY = sStartDrag / tilesInRow;
+                
+                Tile tile;
+                tile.id = (startX + x) + (startY + y) * tilesInRow;
+                tile.palette = global.renderer.GetPickerPaletteNum();
+
+                brush.selection[x + y * sBrushWidth] = tile;
+            }
+        }
+    }
+
+    {
+        int x = sStartDrag % tilesInRow, y = sStartDrag / tilesInRow;
+        ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tileSize * scale;
+        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + ImVec2(sBrushWidth, sBrushHeight) * tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
     }
 
     ImVec2 widgetsize = ImVec2(tilesInRow, 1024 / tilesInRow) * tileSize;
     ImRect bb(ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + widgetsize * scale + ImVec2(1.0f, 1.0f));
-
-    {
-        int x = global.brush.tile % tilesInRow, y = global.brush.tile / tilesInRow;
-        ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tileSize * scale;
-        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
-    }
 
     ImGui::ItemSize(bb);
     ImGui::ItemAdd(bb, 0);
