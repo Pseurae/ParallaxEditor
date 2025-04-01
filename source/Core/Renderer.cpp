@@ -251,9 +251,11 @@ void Renderer::CreatePaletteTexture(void)
 void Renderer::CreateUnderlayTexture(unsigned width, unsigned int height, const unsigned char *data)
 {
     glBindTexture(GL_TEXTURE_2D, mUnderlayTex.id);
-    mUnderlayTex.width = width, mUnderlayTex.height = height;
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    mUnderlayTex.width = width;
+    mUnderlayTex.height = height;
 }
 
 void Renderer::GenerateTexture(Texture &tex)
