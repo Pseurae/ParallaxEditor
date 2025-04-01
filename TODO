@@ -1,6 +1,6 @@
 [X] Create variable sized tilemaps
 [X] Allow single palette choosing
-[ ] Overlay and underlay images
+[X] Underlay images
 [ ] Way to control opacity
 [ ] Proper custom tilemap format
 [ ] Reimplement action stack

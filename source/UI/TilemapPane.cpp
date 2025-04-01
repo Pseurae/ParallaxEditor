@@ -19,6 +19,7 @@ static void ApplyTiles(unsigned int startX, unsigned int startY)
 static void TilemapWindow(void)
 {
     auto drawList = ImGui::GetWindowDrawList();
+    auto underlay = global.renderer.GetUnderlayTex();
 
     auto tex = global.renderer.GetMapTex();
 
@@ -32,6 +33,8 @@ static void TilemapWindow(void)
 
     bool hasHovered = false;
     ImVec2 hoveredPos = ImVec2(0, 0);
+
+    drawList->AddImage(underlay.id, ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + ImVec2(underlay.width, underlay.height) * scale);
 
     for (unsigned int y = 0; y < ytiles; ++y)
     for (unsigned int x = 0; x < xtiles; ++x)

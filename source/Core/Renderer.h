@@ -29,9 +29,11 @@ public:
 
     const Texture &GetPickerTex(void) const { return mPickerTex.tex; }
     const Texture &GetMapTex(void) const { return mMapTex.tex; }
+    const Texture &GetUnderlayTex(void) const { return mUnderlayTex; }
 
     void LoadPrimaryTileset(const std::string &fname);
     void LoadSecondaryTileset(const std::string &fname);
+    void LoadUnderlay(const std::string &fname);
     void Draw(const Context &ctx);
 
     void LoadPalette(const Palette &palette, int slot);
@@ -61,6 +63,7 @@ private:
     void InitializeMap(void);
     void LoadPalette(const void *data, int slot);
     void CreatePaletteTexture(void);
+    void CreateUnderlayTexture(unsigned width, unsigned int height, const unsigned char *data);
     void CreateTexture(unsigned int width, unsigned int height, Texture &);
 
     void GenerateTexture(Texture &);
@@ -77,7 +80,7 @@ private:
     unsigned int mPickerVBO, mPickerEBO;
     unsigned int mMapVBO, mMapEBO;
     unsigned int mPickerShader, mMapShader;
-    Texture mPaletteTex, mTilesetTex;
+    Texture mPaletteTex, mTilesetTex, mUnderlayTex;
     RenderTarget mPickerTex, mMapTex;
 
     MapVertex mMapVertices[MaxVertices];

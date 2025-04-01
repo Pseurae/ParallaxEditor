@@ -149,3 +149,10 @@ void OpenPaletteFolder(void)
         global.renderer.Redraw();
     }
 }
+
+void TryLoadUnderlay(void)
+{
+    std::string p;
+    if (FileDialog::Open(FileDialog::Mode::Open, {{ "Underlay", "png" }}, p))
+        global.renderer.LoadUnderlay(p);
+}

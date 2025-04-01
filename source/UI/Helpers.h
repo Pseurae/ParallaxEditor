@@ -15,3 +15,4 @@ void TryLoadSecondaryTileset(void);
 void UnloadAllPalettes(void);
 void OpenPalette(unsigned int slot);
 void OpenPaletteFolder(void);
+void TryLoadUnderlay(void);

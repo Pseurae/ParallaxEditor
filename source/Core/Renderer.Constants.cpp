@@ -10,7 +10,7 @@ const float tilesetVertices[] =
 };
 
 const unsigned int tilesetIndices[] =
-    {
+{
         0,
         1,
         3,
@@ -84,7 +84,7 @@ const char mapFragmentShaderSource[] = R"(
     {
         float x = texture(texture1, TexCoord).r;
         vec4 color = texture(texture2, vec2(x + (16.0f / 256.0f) * Palette, 0.5f));
-        FragColor = mix(vec4(x * 16.0f), color, color.a);
+        FragColor = vec4(mix(vec3(x * 16.0f), color.rgb, color.a), x == 0.0 ? 0.0f : 1.0f);
     }
     )";
 
@@ -106,4 +106,9 @@ const unsigned char sDefaultPalette[] =
     16 * 13, 16 * 13, 16 * 13,
     16 * 14, 16 * 14, 16 * 14,
     16 * 15, 16 * 15, 16 * 15,
+};
+
+static const unsigned char transparentUnderlayColors[] = 
+{
+    0, 0, 0, 0
 };

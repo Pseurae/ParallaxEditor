@@ -11,7 +11,7 @@ void NewTilemap::DrawContent(void)
         mWidth = std::max(0, mWidth);
 
     if (ImGui::InputInt("Height", &mHeight))
-        mWidth = std::max(0, mHeight);
+        mHeight = std::max(0, mHeight);
 
     if (ImGui::Button("Ok"))
     {

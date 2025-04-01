@@ -7,3 +7,4 @@ extern const char tilesetFragmentShaderSource[];
 extern const char mapVertexShaderSource[];
 extern const char mapFragmentShaderSource[];
 extern const unsigned char sDefaultPalette[];
+extern const unsigned char transparentUnderlayColors[];
