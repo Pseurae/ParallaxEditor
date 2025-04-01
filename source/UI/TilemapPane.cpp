@@ -21,6 +21,8 @@ static void TilemapWindow(void)
 {
     auto drawList = ImGui::GetWindowDrawList();
     auto underlay = global.renderer.GetUnderlayTex();
+    auto &brush = global.brush;
+    const auto &tiles = global.context.GetTiles();
 
     auto tex = global.renderer.GetMapTex();
 
@@ -35,6 +37,9 @@ static void TilemapWindow(void)
     bool hasHovered = false;
     ImVec2 hoveredPos = ImVec2(0, 0);
 
+    static ImVec2 sStartDrag = ImVec2(0, 0);
+    static int sBrushWidth = 1, sBrushHeight = 1;
+
     drawList->AddImage(underlay.id, ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + ImVec2(underlay.width, underlay.height) * scale);
 
     for (unsigned int y = 0; y < ytiles; ++y)
@@ -48,6 +53,9 @@ static void TilemapWindow(void)
         bool hovered = ImGui::ItemHoverable(bb_, ImGui::GetCurrentContext()->CurrentWindow->GetIDFromRectangle(bb_), ImGuiItemFlags_AllowOverlap);
         if (hovered)
         {
+            if (ImGui::IsMouseClicked(1))
+                sStartDrag = ImVec2(x, y);
+
             hasHovered = true;
             hoveredPos = ImVec2(x, y);
         }
@@ -73,8 +81,36 @@ static void TilemapWindow(void)
             ApplyTiles(hoveredPos.x, hoveredPos.y);
         }
 
-        ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + hoveredPos * tileSize * scale;
-        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + ImVec2(global.brush.width, global.brush.height) * tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+        if (ImGui::IsMouseDown(1))
+        {
+            auto delta = ImGui::GetMouseDragDelta(1);
+            sBrushWidth = std::max<int>(std::abs(delta.x) / (tileSize.x * scale), 0) + 1;
+            sBrushHeight = std::max<int>(std::abs(delta.y) / (tileSize.y * scale), 0) + 1;
+
+            ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + sStartDrag * tileSize * scale;
+            drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + ImVec2(sBrushWidth, sBrushHeight) * tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+        }
+        else
+        {
+            ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + hoveredPos * tileSize * scale;
+            drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + ImVec2(global.brush.width, global.brush.height) * tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+        }
+
+        if (ImGui::IsMouseReleased(1))
+        {
+            brush.fromTileset = false;
+            brush.width = sBrushWidth;
+            brush.height = sBrushHeight;
+
+            brush.selection.resize(sBrushWidth * sBrushHeight);
+
+            for (int y = 0; y < sBrushHeight; ++y)
+            for (int x = 0; x < sBrushWidth; ++x)
+            {
+                TilePosition pos = {(unsigned int)(sStartDrag.x + x), (unsigned int)(sStartDrag.y + y)};
+                brush.selection[x + y * sBrushWidth] = tiles.contains(pos) ? tiles.at(pos) : global.context.GetDefaultTile();
+            }
+        }
     }
 }
 

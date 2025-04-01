@@ -40,7 +40,10 @@ void TilesetSelector(void)
         if (hovered)
         {
             if (mouseClicked)
+            {
                 sStartDrag = i;
+                global.brush.fromTileset = true;
+            }
 
             hasHovered = true;
         }
@@ -57,6 +60,7 @@ void TilesetSelector(void)
 
         if (mouseReleased)
         {
+            brush.fromTileset = true;
             brush.width = sBrushWidth;
             brush.height = sBrushHeight;
 
@@ -77,6 +81,7 @@ void TilesetSelector(void)
         }
     }
 
+    if (global.brush.fromTileset)
     {
         int x = sStartDrag % tilesInRow, y = sStartDrag / tilesInRow;
         ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tileSize * scale;
