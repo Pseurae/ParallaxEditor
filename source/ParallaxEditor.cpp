@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     auto &io = ImGui::GetIO();
     io.IniFilename = nullptr;
     io.FontGlobalScale *= global.dpiScale;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -71,15 +71,7 @@ int main(int argc, char *argv[])
             ImGui::NewFrame();
 
             {
-                ImGuiViewport *viewport = ImGui::GetMainViewport();
-                ImGui::SetNextWindowPos(viewport->Pos);
-                ImGui::SetNextWindowSize(viewport->Size - ImVec2(0.0f, ImGui::GetFrameHeight()));
-
-                static constexpr ImGuiWindowFlags sWindowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse;
-                ImGui::Begin("###ParallaxEditor", NULL, sWindowFlags | ImGuiWindowFlags_MenuBar);
                 MainWindow();
-                ImGui::End();
-
                 MainMenuBar();
                 global.popupManager.DrawAndUpdate();
             }

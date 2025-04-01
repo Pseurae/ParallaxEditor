@@ -5,7 +5,7 @@
 
 struct Brush
 {
-    std::vector<Tile> selection;
-    unsigned int width, height;
-    bool fromTileset, xflip, yflip, scrollToSelected;
+    std::vector<Tile> selection{Tile{false, false, 0, 0}};
+    unsigned int width = 1, height = 1;
+    bool fromTileset = true, xflip = false, yflip = false, scrollToSelected;
 };

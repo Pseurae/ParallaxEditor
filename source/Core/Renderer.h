@@ -65,7 +65,7 @@ private:
     void InitializeMap(void);
     void LoadPalette(const void *data, int slot);
     void CreatePaletteTexture(void);
-    void CreateUnderlayTexture(unsigned width, unsigned int height, const unsigned char *data);
+    void CreateUnderlayTexture(unsigned int width, unsigned int height, const unsigned char *data);
     void CreateTexture(unsigned int width, unsigned int height, Texture &);
 
     void GenerateTexture(Texture &);

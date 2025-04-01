@@ -1,4 +1,5 @@
 #include "UI/MainWindow.h"
+#include "UI/OptionsPane.h"
 #include "UI/TilesetPane.h"
 #include "UI/TilemapPane.h"
 #include "Global.h"
@@ -11,11 +12,7 @@ void MainWindow(void)
     if (global.context.IsLoaded())
     {
         TilesetPane();
-        ImGui::SameLine();
+        OptionsPane();
         TilemapPane();
-    }
-    else
-    {
-        ImGui::Text("Press Ctrl+N to create a new tilemap.\nPress Ctrl+O to open an existing tilemap.");
     }
 }

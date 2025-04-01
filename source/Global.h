@@ -13,6 +13,7 @@ struct Global
 {
     double dpiScale, zoomScale = 1.0f;
     bool drawScreenBounds = false;
+    float transparency = 1.0f;
 
     Context context;
 

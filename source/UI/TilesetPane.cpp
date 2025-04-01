@@ -20,7 +20,7 @@ void TilesetSelector(void)
 
     bool hasHovered = false;
     static int sStartDrag = 0;
-    static int sBrushWidth = 0, sBrushHeight = 0;
+    static int sBrushWidth = 1, sBrushHeight = 1;
 
     for (int i = 0; i < 1024; ++i)
     {
@@ -92,23 +92,19 @@ void TilesetSelector(void)
 
 void TilesetPane(void)
 {
-    if (ImGui::BeginChild("Tileset", ImVec2(500.0, 0.0)))
-    {
-        ImGui::Checkbox("X Flip", &global.brush.xflip);
-        ImGui::Checkbox("Y Flip", &global.brush.yflip);
+    ImGui::Begin("Tileset", nullptr, ImGuiWindowFlags_NoResize);
+    ImGui::Checkbox("X Flip", &global.brush.xflip);
+    ImGui::SameLine();
+    ImGui::Checkbox("Y Flip", &global.brush.yflip);
 
-        int palNum = global.renderer.GetPickerPaletteNum();
-        if (ImGui::InputInt("Palette", &palNum))
-            global.renderer.SetPickerPaletteNum(std::min(std::max(palNum, 0), 15));
+    int palNum = global.renderer.GetPickerPaletteNum();
+    if (ImGui::InputInt("Palette", &palNum))
+        global.renderer.SetPickerPaletteNum(std::min(std::max(palNum, 0), 15));
 
-        ImGui::Spacing();
+    ImGui::Spacing();
 
-        if (ImGui::BeginChild("###TilesetSelector", ImVec2(400.0f, 0.0f)))
-        {
-            TilesetSelector();
-            ImGui::EndChild();
-        }
-
-        ImGui::EndChild();
-    }
+    ImGui::BeginChild("###TilesetSelector", ImVec2(400.0f, 800.0f));
+    TilesetSelector();
+    ImGui::EndChild();
+    ImGui::End();
 }

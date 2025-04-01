@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME}
     source/UI/Helpers.cpp
     source/UI/MainWindow.cpp
     source/UI/MenuBar.cpp
+    source/UI/OptionsPane.cpp
     source/UI/TilemapPane.cpp
     source/UI/TilesetPane.cpp
 

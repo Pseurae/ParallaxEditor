@@ -58,10 +58,6 @@ void MainMenuBar(void)
         {
             if (ImGui::MenuItem("Resize", nullptr, nullptr, global.context.IsLoaded()))
                 ;
-            if (ImGui::MenuItem("Load Underlay", nullptr, nullptr, global.context.IsLoaded()))
-                TryLoadUnderlay();
-            if (ImGui::MenuItem("Remove Underlay", nullptr, nullptr, global.context.IsLoaded()))
-                global.renderer.LoadEmptyUnderlay();
 
             ImGui::EndMenu();
         }

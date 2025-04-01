@@ -41,7 +41,7 @@ static void TilemapWindow(void)
     {
         ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tileSize * scale;
         ImVec2 uv0 = ImVec2(x, y) * tileSize / size;
-        drawList->AddImage(tex.id, pos, pos + tileSize * scale, uv0, uv0 + tileSize / size);
+        drawList->AddImage(tex.id, pos, pos + tileSize * scale, uv0, uv0 + tileSize / size, ImColor(1.0f, 1.0f, 1.0f, global.transparency));
 
         ImRect bb_ = ImRect(pos, pos + tileSize * scale);
         bool hovered = ImGui::ItemHoverable(bb_, ImGui::GetCurrentContext()->CurrentWindow->GetIDFromRectangle(bb_), ImGuiItemFlags_AllowOverlap);
@@ -64,9 +64,12 @@ static void TilemapWindow(void)
 
 void TilemapPane(void)
 {
-    if (ImGui::BeginChild("Tilemap", ImVec2(0.0f, 0.0f), 0, ImGuiWindowFlags_HorizontalScrollbar))
-    {
-        TilemapWindow();
-        ImGui::EndChild();
-    }
+    ImGuiViewport *viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size - ImVec2(0.0f, ImGui::GetFrameHeight()));
+
+    static constexpr ImGuiWindowFlags sWindowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
+    ImGui::Begin("###ParallaxEditor", NULL, sWindowFlags | ImGuiWindowFlags_MenuBar);
+    TilemapWindow();
+    ImGui::End();
 }

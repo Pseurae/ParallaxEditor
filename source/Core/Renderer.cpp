@@ -94,7 +94,10 @@ static unsigned char *LoadTilesetTexture(const std::string &fname)
     unsigned char *data = stbi_load(fname.c_str(), &width, &height, &channels, 4);
 
     if (width != 128 || height != 256 || data == nullptr)
+    {
+        stbi_image_free(data);
         return NULL;
+    }
 
     return data;
 }
@@ -106,6 +109,8 @@ void Renderer::LoadPrimaryTileset(const std::string &fname)
     glBindTexture(GL_TEXTURE_2D, mTilesetTex.id);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 256, 128, 256, GL_RED, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    stbi_image_free(data);
     mRedrawFlag = true;
 }
 
@@ -116,19 +121,22 @@ void Renderer::LoadSecondaryTileset(const std::string &fname)
     glBindTexture(GL_TEXTURE_2D, mTilesetTex.id);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 128, 256, GL_RED, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    stbi_image_free(data);
     mRedrawFlag = true;
 }
 
 void Renderer::LoadUnderlay(const std::string &fname)
 {
-    int width, height, channels;
-    // stbi_set_flip_vertically_on_load(1);
-    unsigned char *data = stbi_load(fname.c_str(), &width, &height, &channels, 4);
+    int width = 0, height = 0, channels = 0;
+    stbi_set_flip_vertically_on_load(0);
+    unsigned char *data = stbi_load(fname.c_str(), &width, &height, &channels, STBI_rgb_alpha);
 
     // if (width != mMapTex.tex.width || height != mMapTex.tex.height)
     //     return;
 
     CreateUnderlayTexture(width, height, data);
+    stbi_image_free(data);
 }
 
 void Renderer::DrawTileset(void)
@@ -233,6 +241,7 @@ void Renderer::LoadPalette(const void *data, int slot)
 void Renderer::CreateTexture(unsigned int width, unsigned int height, Texture &texture)
 {
     glBindTexture(GL_TEXTURE_2D, texture.id);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -240,6 +249,7 @@ void Renderer::CreateTexture(unsigned int width, unsigned int height, Texture &t
 void Renderer::CreatePaletteTexture(void)
 {
     glBindTexture(GL_TEXTURE_2D, mPaletteTex.id);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
     for (int i = 0; i < 16; ++i)
@@ -248,9 +258,10 @@ void Renderer::CreatePaletteTexture(void)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Renderer::CreateUnderlayTexture(unsigned width, unsigned int height, const unsigned char *data)
+void Renderer::CreateUnderlayTexture(unsigned int width, unsigned int height, const unsigned char *data)
 {
     glBindTexture(GL_TEXTURE_2D, mUnderlayTex.id);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -306,6 +317,7 @@ void Renderer::SpecifyRenderTargetSize(RenderTarget &target, int width, int heig
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
