@@ -170,12 +170,8 @@ void Renderer::DrawTileset(void)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::DrawTilemap(const Context &ctx)
+void Renderer::FlushTilemap(void)
 {
-    BatchBackground(ctx.GetDefaultTile());
-    for (const auto &[pos, tile] : ctx.GetTiles())
-        BatchTile(pos.x, pos.y, tile);
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mMapEBO);
 
     glBindBuffer(GL_ARRAY_BUFFER, mMapVBO);
@@ -199,13 +195,23 @@ void Renderer::DrawTilemap(const Context &ctx)
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, mPaletteTex.id);
 
+    glDrawElements(GL_TRIANGLES, mMapQuadCount * 6, GL_UNSIGNED_INT, 0);
+    mMapQuadCount = 0;
+}
+
+void Renderer::DrawTilemap(const Context &ctx)
+{
     glBindFramebuffer(GL_FRAMEBUFFER, mMapTex.fbo);
     glViewport(0, 0, mMapTex.tex.width, mMapTex.tex.height);
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glDrawElements(GL_TRIANGLES, mMapQuadCount * 6, GL_UNSIGNED_INT, 0);
+    BatchBackground(ctx.GetDefaultTile());
+    for (const auto &[pos, tile] : ctx.GetTiles())
+        BatchTile(pos.x, pos.y, tile);
+
+    FlushTilemap();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -351,6 +357,9 @@ static inline void swap_val(T *v1, T *v2)
 
 void Renderer::BatchTile(unsigned short x, unsigned short y, const Tile &tile)
 {
+    if (mMapQuadCount >= MaxQuads)
+        FlushTilemap();
+
     auto mapSize = ImVec2(mMapTex.tex.width, mMapTex.tex.height);
     ImVec2 texCoords[4];
     {

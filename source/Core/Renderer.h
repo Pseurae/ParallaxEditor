@@ -59,6 +59,7 @@ private:
     };
 
     void DrawTileset(void);
+    void FlushTilemap(void);
     void DrawTilemap(const Context &ctx);
 
     void InitializePicker(void);

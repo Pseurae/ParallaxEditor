@@ -73,7 +73,6 @@ static void TilemapWindow(void)
         {
             snapshotBuffer.newTiles = global.context.GetTiles();
             action_stack_add_undo_action(snapshotBuffer);
-            fprintf(stdout, "Test");
         }
 
         if (ImGui::IsMouseDown(0))
@@ -112,6 +111,12 @@ static void TilemapWindow(void)
             }
         }
     }
+
+    ImVec2 widgetsize = ImVec2(xtiles, ytiles) * tileSize;
+    ImRect bb(ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + widgetsize * scale + ImVec2(1.0f, 1.0f));
+
+    ImGui::ItemSize(bb);
+    ImGui::ItemAdd(bb, 0);
 }
 
 void TilemapPane(void)
@@ -120,8 +125,12 @@ void TilemapPane(void)
     ImGui::SetNextWindowPos(viewport->Pos);
     ImGui::SetNextWindowSize(viewport->Size - ImVec2(0.0f, ImGui::GetFrameHeight()));
 
-    static constexpr ImGuiWindowFlags sWindowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
+    static constexpr ImGuiWindowFlags sWindowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
     ImGui::Begin("###ParallaxEditor", NULL, sWindowFlags | ImGuiWindowFlags_MenuBar);
-    TilemapWindow();
+    if (ImGui::BeginChild("Tilemap", ImVec2(0, 0), 0, sWindowFlags))
+    {
+        TilemapWindow();
+        ImGui::EndChild();
+    }
     ImGui::End();
 }
