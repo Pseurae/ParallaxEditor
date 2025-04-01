@@ -25,6 +25,7 @@ public:
 
     const std::string &GetPath() const { return mPath; }
     const auto &GetTiles(void) const { return mTiles; }
+    void SetTiles(const std::unordered_map<TilePosition, Tile> &tiles) { mTiles = tiles; }
 
     auto &PalettePaths(void) { return mPalettePaths; }
     auto &TilesetPaths(void) { return mTilesetPaths; }

@@ -5,6 +5,7 @@
 #include "UI/Popups/NewTilemap.h"
 #include "UI/Popups/Palettes.h"
 #include "Utils/FileDialog.h"
+#include "Core/Snapshot.h"
 
 void MainMenuBar(void)
 {
@@ -56,6 +57,12 @@ void MainMenuBar(void)
 
         if (ImGui::BeginMenu("Edit"))
         {
+            if (ImGui::MenuItem("Undo", nullptr, nullptr, action_stack_can_undo()))
+                action_stack_do_undo();
+
+            if (ImGui::MenuItem("Redo", nullptr, nullptr, action_stack_can_redo()))
+                action_stack_do_redo();
+                
             if (ImGui::MenuItem("Resize", nullptr, nullptr, global.context.IsLoaded()))
                 ;
 

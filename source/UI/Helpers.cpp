@@ -1,5 +1,6 @@
 #include "UI/Helpers.h"
 #include "Global.h"
+#include "Core/Snapshot.h"
 #include "Utils/FileDialog.h"
 #include "Helpers.h"
 #include <filesystem>
@@ -9,6 +10,7 @@ void CreateNewTilemap(int width, int height)
 {
     global.context.New(width, height);
     global.renderer.ResizeMapTexture(width, height);
+    action_stack_clear();
 }
 
 void TryLoadTilemap(void)
@@ -19,6 +21,7 @@ void TryLoadTilemap(void)
         global.context.Load(s);
         global.renderer.ResizeMapTexture(global.context.GetWidth(), global.context.GetHeight());
         global.renderer.Redraw();
+        action_stack_clear();
     }
 }
 

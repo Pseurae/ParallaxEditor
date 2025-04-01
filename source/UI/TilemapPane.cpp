@@ -4,6 +4,7 @@
 #include <imgui_internal.h>
 #include "Global.h"
 #include <iostream>
+#include "Core/Snapshot.h"
 
 static void ApplyTiles(unsigned int startX, unsigned int startY)
 {
@@ -52,10 +53,25 @@ static void TilemapWindow(void)
         }
     }
 
+    static Snapshot snapshotBuffer;
     if (hasHovered)
     {
+        if (ImGui::IsMouseClicked(0))
+        {
+            snapshotBuffer.oldTiles = global.context.GetTiles();
+        }
+
+        if (ImGui::IsMouseReleased(0))
+        {
+            snapshotBuffer.newTiles = global.context.GetTiles();
+            action_stack_add_undo_action(snapshotBuffer);
+            fprintf(stdout, "Test");
+        }
+
         if (ImGui::IsMouseDown(0))
+        {
             ApplyTiles(hoveredPos.x, hoveredPos.y);
+        }
 
         ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + hoveredPos * tileSize * scale;
         drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + ImVec2(global.brush.width, global.brush.height) * tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
