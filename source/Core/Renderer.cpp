@@ -95,7 +95,7 @@ static unsigned char *LoadTilesetTexture(const std::string &fname)
 
     if (width != 128 || height != 256 || data == nullptr)
     {
-        stbi_image_free(data);
+        if (data) stbi_image_free(data);
         return NULL;
     }
 
