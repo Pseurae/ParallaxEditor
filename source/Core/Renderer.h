@@ -44,6 +44,8 @@ public:
     void ResizeMapTexture(int width, int height);
     void Redraw(void) { mRedrawFlag = true; }
 
+    void LoadEmptyUnderlay(void);
+
 private:
     static constexpr int MaxQuads = 20000;
     static constexpr int MaxVertices = 20000 * 4;

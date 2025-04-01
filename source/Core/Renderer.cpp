@@ -20,7 +20,7 @@ void Renderer::Initialize(void)
     CreateTexture(128, 512, mTilesetTex);
 
     GenerateTexture(mUnderlayTex);
-    CreateUnderlayTexture(1, 1, transparentUnderlayColors);
+    LoadEmptyUnderlay();
 
     InitializePicker();
     InitializeMap();
@@ -312,6 +312,11 @@ void Renderer::ResizeMapTexture(int width, int height)
 {
     SpecifyRenderTargetSize(mMapTex, width * 8, height * 8);
     mRedrawFlag = true;
+}
+
+void Renderer::LoadEmptyUnderlay(void)
+{
+    CreateUnderlayTexture(1, 1, transparentUnderlayColors);
 }
 
 static const ImVec2 sTransformVectors[4] =

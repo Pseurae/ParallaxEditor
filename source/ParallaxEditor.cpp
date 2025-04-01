@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-    GLFWwindow *window = glfwCreateWindow(800, 600, "Test", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(800, 600, "Darkfire Tilemap Editor", nullptr, nullptr);
     ASSERT(window, "GLFWwindow could not be created.");
 
     {
