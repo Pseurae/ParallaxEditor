@@ -1276,7 +1276,7 @@ static unsigned char *stbi__load_and_postprocess_8bit(stbi__context *s, int *x, 
    // @TODO: move stbi__convert_format to here
 
    if (stbi__vertically_flip_on_load) {
-      int channels = comp ? *comp : req_comp;
+      int channels = *comp == 1 ? 1 : (req_comp ? req_comp : *comp);
       stbi__vertical_flip(result, *x, *y, channels * sizeof(stbi_uc));
    }
 
