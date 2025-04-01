@@ -61,6 +61,7 @@ void TryImportTilemap(const std::vector<Tile> &tiles, int width)
 {
     global.context.Import(tiles, width, tiles.size() / width);
     global.renderer.ResizeMapTexture(width, tiles.size() / width);
+    action_stack_clear();
 }
 
 void TryExportTilemap(void)
