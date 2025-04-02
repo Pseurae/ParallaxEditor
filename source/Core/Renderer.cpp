@@ -93,7 +93,7 @@ static unsigned char *LoadTilesetTexture(const std::string &fname)
     stbi_set_flip_vertically_on_load(1);
     unsigned char *data = stbi_load(fname.c_str(), &width, &height, &channels, 4);
 
-    if (width != 128 || height != 256 || data == nullptr)
+    if (width != 128 || height != 256 || data == nullptr || channels != 1)
     {
         if (data) stbi_image_free(data);
         return NULL;
@@ -102,9 +102,12 @@ static unsigned char *LoadTilesetTexture(const std::string &fname)
     return data;
 }
 
-void Renderer::LoadPrimaryTileset(const std::string &fname)
+bool Renderer::LoadPrimaryTileset(const std::string &fname)
 {
     unsigned char *data = LoadTilesetTexture(fname);
+
+    if (!data)
+        return false;
 
     glBindTexture(GL_TEXTURE_2D, mTilesetTex.id);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 256, 128, 256, GL_RED, GL_UNSIGNED_BYTE, data);
@@ -112,11 +115,16 @@ void Renderer::LoadPrimaryTileset(const std::string &fname)
 
     stbi_image_free(data);
     mRedrawFlag = true;
+
+    return true;
 }
 
-void Renderer::LoadSecondaryTileset(const std::string &fname)
+bool Renderer::LoadSecondaryTileset(const std::string &fname)
 {
     unsigned char *data = LoadTilesetTexture(fname);
+
+    if (!data)
+        return false;
 
     glBindTexture(GL_TEXTURE_2D, mTilesetTex.id);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 128, 256, GL_RED, GL_UNSIGNED_BYTE, data);
@@ -124,19 +132,29 @@ void Renderer::LoadSecondaryTileset(const std::string &fname)
 
     stbi_image_free(data);
     mRedrawFlag = true;
+
+    return true;
 }
 
-void Renderer::LoadUnderlay(const std::string &fname)
+bool Renderer::LoadUnderlay(const std::string &fname)
 {
     int width = 0, height = 0, channels = 0;
     stbi_set_flip_vertically_on_load(0);
     unsigned char *data = stbi_load(fname.c_str(), &width, &height, &channels, STBI_rgb_alpha);
 
+    if (!data)
+        return false;
+
     // if (width != mMapTex.tex.width || height != mMapTex.tex.height)
-    //     return;
+    // {
+    //     stbi_image_free(data);
+    //     return false;
+    // }
 
     CreateUnderlayTexture(width, height, data);
     stbi_image_free(data);
+
+    return true;
 }
 
 void Renderer::DrawTileset(void)

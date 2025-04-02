@@ -12,7 +12,15 @@ static void ApplyTiles(unsigned int startX, unsigned int startY)
 
     for (unsigned int y = 0; y < brush.height; ++y)
     for (unsigned int x = 0; x < brush.width; ++x)
-        global.context.AddTile({x + startX, y + startY}, brush.selection[x + y * brush.width]);
+    {
+        Tile tile = brush.selection.at(x + y * brush.width);
+        tile.xflip ^= brush.xflip;
+        tile.yflip ^= brush.yflip;
+
+        int modifiedX = brush.xflip ? (brush.width - x - 1) : x;
+        int modifiedY = brush.yflip ? (brush.height - y - 1) : y;
+        global.context.AddTile({modifiedX + startX, modifiedY + startY}, tile);
+    }
 
     global.renderer.Redraw();
 }
@@ -108,6 +116,12 @@ static void TilemapWindow(void)
             {
                 TilePosition pos = {(unsigned int)(sStartDrag.x + x), (unsigned int)(sStartDrag.y + y)};
                 brush.selection[x + y * sBrushWidth] = tiles.contains(pos) ? tiles.at(pos) : global.context.GetDefaultTile();
+
+                if (sBrushHeight == 1 && sBrushWidth == 1)
+                {
+                    brush.xflip = brush.selection[x + y * sBrushWidth].xflip;
+                    brush.yflip = brush.selection[x + y * sBrushWidth].yflip;
+                }
             }
         }
     }
@@ -125,7 +139,7 @@ void TilemapPane(void)
     ImGui::SetNextWindowPos(viewport->Pos);
     ImGui::SetNextWindowSize(viewport->Size - ImVec2(0.0f, ImGui::GetFrameHeight()));
 
-    static constexpr ImGuiWindowFlags sWindowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
+    static constexpr ImGuiWindowFlags sWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
     ImGui::Begin("###ParallaxEditor", NULL, sWindowFlags | ImGuiWindowFlags_MenuBar);
     if (ImGui::BeginChild("Tilemap", ImVec2(0, 0), 0, sWindowFlags))
     {

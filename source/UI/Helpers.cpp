@@ -3,6 +3,7 @@
 #include "Core/Snapshot.h"
 #include "Utils/FileDialog.h"
 #include "Helpers.h"
+#include "Popups/Error.h"
 #include <filesystem>
 #include <fstream>
 
@@ -77,7 +78,8 @@ void TryLoadPrimaryTileset(void)
     if (FileDialog::Open(FileDialog::Mode::Open, {{ "Tileset", "png" }}, p))
     {
         global.context.TilesetPaths()[0] = p;
-        global.renderer.LoadPrimaryTileset(p);
+        if (!global.renderer.LoadPrimaryTileset(p))
+            global.popupManager.Open<Popups::Error>("Could not load primary tileset!");
     }
 }
 
@@ -87,7 +89,8 @@ void TryLoadSecondaryTileset(void)
     if (FileDialog::Open(FileDialog::Mode::Open, {{ "Tileset", "png" }}, p))
     {
         global.context.TilesetPaths()[1] = p;
-        global.renderer.LoadSecondaryTileset(p);
+        if (global.renderer.LoadSecondaryTileset(p))
+            global.popupManager.Open<Popups::Error>("Could not load secondary tileset!");
     }
 }
 

@@ -31,9 +31,9 @@ public:
     const Texture &GetMapTex(void) const { return mMapTex.tex; }
     const Texture &GetUnderlayTex(void) const { return mUnderlayTex; }
 
-    void LoadPrimaryTileset(const std::string &fname);
-    void LoadSecondaryTileset(const std::string &fname);
-    void LoadUnderlay(const std::string &fname);
+    bool LoadPrimaryTileset(const std::string &fname);
+    bool LoadSecondaryTileset(const std::string &fname);
+    bool LoadUnderlay(const std::string &fname);
     void Draw(const Context &ctx);
 
     void LoadPalette(const Palette &palette, int slot);

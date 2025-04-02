@@ -81,11 +81,18 @@ void TilesetSelector(void)
         }
     }
 
-    if (global.brush.fromTileset)
+    if (brush.fromTileset)
     {
         int x = sStartDrag % tilesInRow, y = sStartDrag / tilesInRow;
         ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tileSize * scale;
         drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + ImVec2(sBrushWidth, sBrushHeight) * tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+    }
+    else if (brush.width == 1 && brush.height == 1)
+    {
+        const Tile &tile = global.brush.selection[0]; 
+        int x = tile.id % tilesInRow, y = tile.id / tilesInRow;
+        ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tileSize * scale;
+        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
     }
 
     ImVec2 widgetsize = ImVec2(tilesInRow, 1024 / tilesInRow) * tileSize;
@@ -97,7 +104,7 @@ void TilesetSelector(void)
 
 void TilesetPane(void)
 {
-    ImGui::Begin("Tileset", nullptr, ImGuiWindowFlags_NoResize);
+    ImGui::Begin("Tileset", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
     ImGui::Checkbox("X Flip", &global.brush.xflip);
     ImGui::SameLine();
     ImGui::Checkbox("Y Flip", &global.brush.yflip);
