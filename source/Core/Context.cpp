@@ -103,13 +103,21 @@ void Context::Import(const std::vector<Tile> &tiles, int width, int height)
     mLoaded = true;
 }
 
-static inline unsigned short ConvertTileToPalette(const Tile &tile)
+static inline unsigned short ConvertTileToGBA(const Tile &tile)
 {
-    return tile.id & 0x3FF |
+    return (tile.id & 0x3FF) |
         (tile.xflip ? 0x400 : 0) |
         (tile.yflip ? 0x800 : 0) |
         (tile.palette & 0xF);
 }
+
+struct GbaTile
+{
+    unsigned short tile:10;
+    unsigned short xflip:1;
+    unsigned short yflip:1;
+    unsigned short bank:4;
+};
 
 void Context::Export(const std::string &path)
 {
@@ -118,9 +126,9 @@ void Context::Export(const std::string &path)
     for (unsigned int x = 0; x < mWidth; ++x)
     {
         const auto &tile = mTiles.contains({ x, y }) ? mTiles.at({ x, y }) : mDefaultTile;
-        unsigned short bytes = ConvertTileToPalette(tile);
-
-        fs.write(reinterpret_cast<char *>(&bytes), 2);
+        // unsigned short bytes = ConvertTileToGBA(tile);
+        GbaTile gbaTile{tile.id, tile.xflip, tile.yflip, tile.palette};
+        fs.write(reinterpret_cast<char *>(&gbaTile), 2);
     }
     fs.close();
 }

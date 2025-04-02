@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME}
     source/Core/Popup.cpp
     source/Core/Renderer.Constants.cpp
     source/Core/Renderer.cpp
+    source/Core/Shortcut.cpp
     source/Core/Snapshot.cpp
 
     source/UI/Popups/Error.cpp

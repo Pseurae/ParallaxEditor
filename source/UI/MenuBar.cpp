@@ -57,15 +57,12 @@ void MainMenuBar(void)
 
         if (ImGui::BeginMenu("Edit"))
         {
-            if (ImGui::MenuItem("Undo", nullptr, nullptr, action_stack_can_undo()))
+            if (ImGui::MenuItem("Undo", "Ctrl+Z", nullptr, action_stack_can_undo()))
                 action_stack_do_undo();
 
-            if (ImGui::MenuItem("Redo", nullptr, nullptr, action_stack_can_redo()))
+            if (ImGui::MenuItem("Redo", "Ctrl+Y", nullptr, action_stack_can_redo()))
                 action_stack_do_redo();
                 
-            if (ImGui::MenuItem("Resize", nullptr, nullptr, global.context.IsLoaded()))
-                ;
-
             ImGui::EndMenu();
         }
 

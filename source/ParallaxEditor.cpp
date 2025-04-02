@@ -13,6 +13,7 @@
 #include "Utils/FileDialog.h"
 #include "UI/MenuBar.h"
 #include "UI/MainWindow.h"
+#include "Core/Shortcut.h"
 
 int main(int argc, char *argv[])
 {
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
     glfwShowWindow(window);
 
     glfwSetKeyCallback(window, [](GLFWwindow* window, int k, int, int a, int m) {
+        shortcut_callback(k, m, a);
     });
 
     ASSERT(gl3wInit() != -1, "GL3W could not be initialized.");
