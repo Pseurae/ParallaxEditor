@@ -109,6 +109,9 @@ static void TilemapWindow(void)
             brush.width = sBrushWidth;
             brush.height = sBrushHeight;
 
+            brush.xflip = false;
+            brush.yflip = false;
+
             brush.selection.resize(sBrushWidth * sBrushHeight);
 
             for (int y = 0; y < sBrushHeight; ++y)
