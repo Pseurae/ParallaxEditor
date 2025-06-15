@@ -24,6 +24,8 @@ FetchContent_Declare(nfd
     GIT_TAG v1.2.1
 )
 
+set(NFD_OVERRIDE_RECENT_WITH_DEFAULT ON)
+
 FetchContent_MakeAvailable(nfd)
 
 FetchContent_Declare(tomlplusplus

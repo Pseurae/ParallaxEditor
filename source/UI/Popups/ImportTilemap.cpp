@@ -10,7 +10,7 @@ void ImportTilemap::DrawContent(void)
 {
     if (ImGui::Button("Open Tilemap"))
     {
-        if (FileDialog::Open(FileDialog::Mode::Open, {{ "Tilemap", "bin" }}, mPath))
+        if (FileDialog::Open(FileDialog::Mode::Open, {{ "Tilemap", "bin" }}, mPath, mPath))
             mTiles = LoadBinaryTilemap(mPath);
     }
 

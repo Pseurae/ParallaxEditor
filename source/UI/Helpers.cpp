@@ -16,8 +16,8 @@ void CreateNewTilemap(int width, int height)
 
 void TryLoadTilemap(void)
 {
-    std::string s;
-    if (FileDialog::Open(FileDialog::Mode::Open, {{"Tilemap", "toml"}}, s))
+    static std::string s;
+    if (FileDialog::Open(FileDialog::Mode::Open, {{"Tilemap", "toml"}}, s, s))
     {
         global.context.Load(s);
         global.renderer.ResizeMapTexture(global.context.GetWidth(), global.context.GetHeight());
@@ -28,8 +28,8 @@ void TryLoadTilemap(void)
 
 void TrySaveTilemap(void)
 {
-    std::string p;
-    if (FileDialog::Open(FileDialog::Mode::Save, {{ "Tilemap", "toml" }}, p))
+    static std::string p;
+    if (FileDialog::Open(FileDialog::Mode::Save, {{ "Tilemap", "toml" }}, p, p))
         global.context.Save(p);
 }
 
@@ -67,15 +67,15 @@ void TryImportTilemap(const std::vector<Tile> &tiles, int width)
 
 void TryExportTilemap(void)
 {
-    std::string p;
-    if (FileDialog::Open(FileDialog::Mode::Save, {{ "Tilemap", "bin" }}, p))
+    static std::string p;
+    if (FileDialog::Open(FileDialog::Mode::Save, {{ "Tilemap", "bin" }}, p, p))
         global.context.Export(p);
 }
 
 void TryLoadPrimaryTileset(void)
 {
-    std::string p;
-    if (FileDialog::Open(FileDialog::Mode::Open, {{ "Tileset", "png" }}, p))
+    static std::string p;
+    if (FileDialog::Open(FileDialog::Mode::Open, {{ "Tileset", "png" }}, p, p))
     {
         global.context.TilesetPaths()[0] = p;
         if (!global.renderer.LoadPrimaryTileset(p))
@@ -85,11 +85,11 @@ void TryLoadPrimaryTileset(void)
 
 void TryLoadSecondaryTileset(void)
 {
-    std::string p;
-    if (FileDialog::Open(FileDialog::Mode::Open, {{ "Tileset", "png" }}, p))
+    static std::string p;
+    if (FileDialog::Open(FileDialog::Mode::Open, {{ "Tileset", "png" }}, p, p))
     {
         global.context.TilesetPaths()[1] = p;
-        if (global.renderer.LoadSecondaryTileset(p))
+        if (!global.renderer.LoadSecondaryTileset(p))
             global.popupManager.Open<Popups::Error>("Could not load secondary tileset!");
     }
 }
@@ -103,9 +103,9 @@ void UnloadAllPalettes(void)
 
 void OpenPalette(unsigned int slot)
 {
-    std::string s;
+    static std::string s;
 
-    if (FileDialog::Open(FileDialog::Mode::Open, {{"Palette", "pal"}}, s))
+    if (FileDialog::Open(FileDialog::Mode::Open, {{"Palette", "pal"}}, s, s))
     {
         global.context.PalettePaths()[slot] = s;
         global.renderer.LoadPalette(Palette(s), slot);
@@ -137,8 +137,8 @@ static const char gPaletteFileNames[][7] =
 
 void OpenPaletteFolder(void)
 {
-    std::string s;
-    if (FileDialog::Open(FileDialog::Mode::Folder, {}, s))
+    static std::string s;
+    if (FileDialog::Open(FileDialog::Mode::Folder, {}, s, s))
     {
         std::filesystem::path paletteFolderPath = s;
 
@@ -159,7 +159,7 @@ void OpenPaletteFolder(void)
 
 void TryLoadUnderlay(void)
 {
-    std::string p;
-    if (FileDialog::Open(FileDialog::Mode::Open, {{ "Underlay", "png" }}, p))
+    static std::string p;
+    if (FileDialog::Open(FileDialog::Mode::Open, {{ "Underlay", "png" }}, p, p))
         global.renderer.LoadUnderlay(p);
 }

@@ -144,10 +144,8 @@ void TilemapPane(void)
 
     static constexpr ImGuiWindowFlags sWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
     ImGui::Begin("###ParallaxEditor", NULL, sWindowFlags | ImGuiWindowFlags_MenuBar);
-    if (ImGui::BeginChild("Tilemap", ImVec2(0, 0), 0, sWindowFlags))
-    {
-        TilemapWindow();
-        ImGui::EndChild();
-    }
+    ImGui::BeginChild("Tilemap", ImVec2(0, 0), 0, sWindowFlags);
+    TilemapWindow();
+    ImGui::EndChild();
     ImGui::End();
 }
