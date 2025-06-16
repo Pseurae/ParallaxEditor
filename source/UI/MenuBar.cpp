@@ -16,33 +16,36 @@ void MainMenuBar(void)
             if (ImGui::MenuItem("New Tilemap"))
                 global.popupManager.Open<Popups::NewTilemap>();
 
-            if (ImGui::MenuItem("Open Tilemap"))
-                TryLoadTilemap();
+            // if (ImGui::MenuItem("Open Tilemap"))
+            //     TryLoadTilemap();
 
-            if (ImGui::MenuItem("Save Tilemap", nullptr, nullptr, global.context.IsLoaded()))
-                TrySaveTilemap();
+            // if (ImGui::MenuItem("Save Tilemap", nullptr, nullptr, global.context.IsLoaded()))
+            //     TrySaveTilemap();
 
-            ImGui::Separator();
+            // ImGui::Separator();
 
-            if (ImGui::MenuItem("Import Tilemap", nullptr, nullptr))
+            if (ImGui::MenuItem("Open Tilemap", nullptr, nullptr))
                 global.popupManager.Open<Popups::ImportTilemap>();
 
-            if (ImGui::MenuItem("Export Tilemap", nullptr, nullptr, global.context.IsLoaded()))
+            if (ImGui::MenuItem("Save Tilemap", nullptr, nullptr, global.context.IsLoaded()))
                 TryExportTilemap();
 
-            ImGui::EndMenu();
-        }
-
-        if (ImGui::BeginMenu("Tileset"))
-        {
-            if (ImGui::MenuItem("Load Primary Tileset", nullptr, nullptr, global.context.IsLoaded()))
-                TryLoadPrimaryTileset();
-
-            if (ImGui::MenuItem("Load Secondary Tileset", nullptr, nullptr, global.context.IsLoaded()))
-                TryLoadSecondaryTileset();
+            if (ImGui::MenuItem("Open Project", nullptr, nullptr))
+                TryOpenProjectFolder();
 
             ImGui::EndMenu();
         }
+
+        // if (ImGui::BeginMenu("Tileset"))
+        // {
+        //     if (ImGui::MenuItem("Load Primary Tileset", nullptr, nullptr, global.context.IsLoaded()))
+        //         TryLoadPrimaryTileset();
+
+        //     if (ImGui::MenuItem("Load Secondary Tileset", nullptr, nullptr, global.context.IsLoaded()))
+        //         TryLoadSecondaryTileset();
+
+        //     ImGui::EndMenu();
+        // }
 
         if (ImGui::BeginMenu("Palettes"))
         {

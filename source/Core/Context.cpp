@@ -1,4 +1,5 @@
 #include "Core/Context.h"
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include "Context.h"
@@ -147,4 +148,29 @@ const std::string Context::GetName() const
 void Context::AddTile(const TilePosition &pos, const Tile &tile)
 {
     mTiles[pos] = tile;
+}
+
+void Context::OpenProjectFolder(const std::string &fname)
+{
+    mPrimaryTilesets.clear();
+    mSecondaryTilesets.clear();
+
+    std::filesystem::path tilesetFolderPath = std::filesystem::path(fname) / "data" / "tilesets";
+
+    for (const auto &entry : std::filesystem::directory_iterator(tilesetFolderPath / "primary"))
+    {
+        if (entry.is_directory())
+            mPrimaryTilesets.push_back(entry.path().string());
+    }
+
+    for (const auto &entry : std::filesystem::directory_iterator(tilesetFolderPath / "secondary"))
+    {
+        if (entry.is_directory())
+            mSecondaryTilesets.push_back(entry.path().string());
+    }
+
+    std::sort(mPrimaryTilesets.begin(), mPrimaryTilesets.end());
+    std::sort(mSecondaryTilesets.begin(), mSecondaryTilesets.end());
+
+    mProjectLoaded = true;
 }

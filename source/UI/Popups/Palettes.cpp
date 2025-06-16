@@ -29,8 +29,5 @@ void Palettes::DrawContent(void)
         Close();
     
     ImGui::SameLine();
-
-    if (ImGui::Button("Open from Folder"))
-        OpenPaletteFolder();
 }
 }

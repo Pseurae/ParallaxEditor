@@ -72,26 +72,25 @@ void TryExportTilemap(void)
         global.context.Export(p);
 }
 
-void TryLoadPrimaryTileset(void)
+void TryOpenProjectFolder(void)
 {
-    static std::string p;
-    if (FileDialog::Open(FileDialog::Mode::Open, {{ "Tileset", "png" }}, p, p))
-    {
-        global.context.TilesetPaths()[0] = p;
-        if (!global.renderer.LoadPrimaryTileset(p))
-            global.popupManager.Open<Popups::Error>("Could not load primary tileset!");
-    }
+    std::string p;
+    if (FileDialog::Open(FileDialog::Mode::Folder, {}, p))
+        global.context.OpenProjectFolder(p);
 }
 
-void TryLoadSecondaryTileset(void)
+void TryLoadPrimaryTileset(const std::string &p)
 {
-    static std::string p;
-    if (FileDialog::Open(FileDialog::Mode::Open, {{ "Tileset", "png" }}, p, p))
-    {
-        global.context.TilesetPaths()[1] = p;
-        if (!global.renderer.LoadSecondaryTileset(p))
-            global.popupManager.Open<Popups::Error>("Could not load secondary tileset!");
-    }
+    global.context.TilesetPaths()[0] = p;
+    if (!global.renderer.LoadPrimaryTileset(p))
+        global.popupManager.Open<Popups::Error>("Could not load primary tileset!");
+}
+
+void TryLoadSecondaryTileset(const std::string &p)
+{
+    global.context.TilesetPaths()[1] = p;
+    if (!global.renderer.LoadSecondaryTileset(p))
+        global.popupManager.Open<Popups::Error>("Could not load secondary tileset!");
 }
 
 void UnloadAllPalettes(void)
@@ -135,26 +134,22 @@ static const char gPaletteFileNames[][7] =
     "15.pal"
 };
 
-void OpenPaletteFolder(void)
+void OpenPaletteFolder(const std::string &s)
 {
-    static std::string s;
-    if (FileDialog::Open(FileDialog::Mode::Folder, {}, s, s))
+    std::filesystem::path paletteFolderPath = s;
+
+    for (int i = 0; i < 16; ++i)
     {
-        std::filesystem::path paletteFolderPath = s;
+        auto palPath = paletteFolderPath / gPaletteFileNames[i];
 
-        for (int i = 0; i < 16; ++i)
+        if (std::filesystem::exists(palPath))
         {
-            auto palPath = paletteFolderPath / gPaletteFileNames[i];
-    
-            if (std::filesystem::exists(palPath))
-            {
-                global.context.PalettePaths()[i] = palPath.string();
-                global.renderer.LoadPalette(Palette(palPath.string()), i);
-            }
+            global.context.PalettePaths()[i] = palPath.string();
+            global.renderer.LoadPalette(Palette(palPath.string()), i);
         }
-
-        global.renderer.Redraw();
     }
+
+    global.renderer.Redraw();
 }
 
 void TryLoadUnderlay(void)

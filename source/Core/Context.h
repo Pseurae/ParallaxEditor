@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <array>
+#include <vector>
 #include "Utils/Palette.h"
 #include "Utils/Tile.h"
 
@@ -27,10 +28,12 @@ public:
     const auto &GetTiles(void) const { return mTiles; }
     void SetTiles(const std::unordered_map<TilePosition, Tile> &tiles) { mTiles = tiles; }
 
+    void OpenProjectFolder(const std::string &fname);
+    
     auto &PalettePaths(void) { return mPalettePaths; }
     auto &TilesetPaths(void) { return mTilesetPaths; }
 
-    bool IsLoaded(void) { return mLoaded; }
+    bool IsLoaded(void) { return mLoaded && mProjectLoaded; }
 
     const unsigned short GetWidth() const { return mWidth; }
     const unsigned short GetHeight() const { return mHeight; }
@@ -38,6 +41,9 @@ public:
     const Tile GetDefaultTile() const { return mDefaultTile; }
 
     void AddTile(const TilePosition &pos, const Tile &tile);
+
+    const auto &GetPrimaryTilesets() { return mPrimaryTilesets; }
+    const auto &GetSecondaryTilesets() { return mSecondaryTilesets; }
 
 private:
     std::string mPath;
@@ -49,7 +55,10 @@ private:
     std::array<std::string, 16> mPalettePaths;
     std::array<std::string, 2> mTilesetPaths;
 
+    std::vector<std::string> mPrimaryTilesets;
+    std::vector<std::string> mSecondaryTilesets;
+
     bool mIs8BPP = false;
     bool mDirty = false;
-    bool mLoaded = false;
+    bool mLoaded = false, mProjectLoaded = false;
 };
