@@ -134,11 +134,11 @@ static const char gPaletteFileNames[][7] =
     "15.pal"
 };
 
-void OpenPaletteFolder(const std::string &s)
+void OpenPaletteFolder(const std::string &s, int start, int end)
 {
     std::filesystem::path paletteFolderPath = s;
 
-    for (int i = 0; i < 16; ++i)
+    for (int i = start; i < end; ++i)
     {
         auto palPath = paletteFolderPath / gPaletteFileNames[i];
 

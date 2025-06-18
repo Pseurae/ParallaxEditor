@@ -26,11 +26,13 @@ void OptionsPane(void)
             std::filesystem::path tilesetFolder = std::filesystem::path(primaryTilesets[n]);
             std::string tilesetName = tilesetFolder.filename().string();
             std::filesystem::path tilesetPath =  tilesetFolder / "tiles.png";
+            std::filesystem::path tilesetPalettes =  tilesetFolder / "palettes";
 
             if (ImGui::Selectable(tilesetName.c_str(), is_selected))
             {
                 primaryTilesetIdx = n;
                 TryLoadPrimaryTileset(tilesetPath.string());
+                OpenPaletteFolder(tilesetPalettes.string(), 0, 6);
             }
 
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -69,7 +71,7 @@ void OptionsPane(void)
                 {
                     secondaryTilesetIdx = n;
                     TryLoadSecondaryTileset(tilesetPath.string());
-                    OpenPaletteFolder(tilesetPalettes.string());
+                    OpenPaletteFolder(tilesetPalettes.string(), 7, 13);
                 }
             }
         }

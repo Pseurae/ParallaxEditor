@@ -14,6 +14,6 @@ void TryLoadPrimaryTileset(const std::string &p);
 void TryLoadSecondaryTileset(const std::string &p);
 void UnloadAllPalettes(void);
 void OpenPalette(unsigned int slot);
-void OpenPaletteFolder(const std::string &paletteFolderPath);
+void OpenPaletteFolder(const std::string &paletteFolderPath, int start, int end);
 void TryLoadUnderlay(void);
 void TryOpenProjectFolder(void);
