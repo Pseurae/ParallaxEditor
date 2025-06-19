@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
     ImGui_ImplOpenGL3_Init("#version 330");
 
     global.renderer.Initialize();
+    glfwSwapInterval(1);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -86,9 +87,18 @@ int main(int argc, char *argv[])
         }
 
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        if (!glfwGetWindowAttrib(window, GLFW_VISIBLE) || 
+            glfwGetWindowAttrib(window, GLFW_ICONIFIED)) 
+        {
+            glfwWaitEvents();
+        }
+        else
+        {
+            glfwPollEvents();
+        }
     }
 
+    glfwHideWindow(window);
     global.renderer.Shutdown();
     glfwDestroyWindow(window);
     glfwTerminate();

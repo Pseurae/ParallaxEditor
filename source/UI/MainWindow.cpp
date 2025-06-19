@@ -9,12 +9,4 @@
 
 void MainWindow(void)
 {
-    // ImGui::DockSpaceOverViewport();
-
-    if (global.context.IsLoaded())
-    {
-        TilesetPane();
-        OptionsPane();
-        TilemapPane();
-    }
 }
