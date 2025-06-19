@@ -9,4 +9,10 @@
 
 void MainWindow(void)
 {
+    if (global.context.IsLoaded())
+    {
+        TilesetPane();
+        OptionsPane();
+        TilemapPane();
+    }
 }
