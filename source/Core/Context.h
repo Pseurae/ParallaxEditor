@@ -13,8 +13,6 @@ public:
     Context() = default;
 
     void New(int width, int height);
-    void Load(const std::string &fname);
-    void Save(const std::string &path);
 
     void Import(const std::vector<Tile> &tiles, int width, int height);
     void Export(const std::string &path);

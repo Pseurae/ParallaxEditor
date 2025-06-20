@@ -32,5 +32,5 @@ add_executable(${PROJECT_NAME}
     source/Global.cpp
     source/ParallaxEditor.cpp)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC imgui glfw gl3w stb_image nfd tomlplusplus::tomlplusplus)
+target_link_libraries(${PROJECT_NAME} PUBLIC imgui glfw gl3w stb_image nfd nlohmann_json)
 target_include_directories(${PROJECT_NAME} PUBLIC source)

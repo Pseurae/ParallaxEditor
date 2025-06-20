@@ -28,12 +28,10 @@ public:
     void Shutdown(void);
 
     const Texture &GetPickerTex(void) const { return mPickerTex.tex; }
-    const Texture &GetMapTex(void) const { return mMapTex.tex; }
-    const Texture &GetUnderlayTex(void) const { return mUnderlayTex; }
+    const Texture &GetMapTex(void) const { return mLightMapTex.tex; }
 
     bool LoadPrimaryTileset(const std::string &fname);
     bool LoadSecondaryTileset(const std::string &fname);
-    bool LoadUnderlay(const std::string &fname);
     void Draw(const Context &ctx);
 
     void LoadPalette(const Palette &palette, int slot);
@@ -44,14 +42,12 @@ public:
     void ResizeMapTexture(int width, int height);
     void Redraw(void) { mRedrawFlag = true; }
 
-    void LoadEmptyUnderlay(void);
-
 private:
     static constexpr int MaxQuads = 20000;
     static constexpr int MaxVertices = 20000 * 4;
     static constexpr int MaxIndices = 20000 * 6;
 
-    struct MapVertex final
+    struct LightMapVertex final
     {
         ImVec2 pos;
         ImVec2 uv;
@@ -63,10 +59,10 @@ private:
     void DrawTilemap(const Context &ctx);
 
     void InitializePicker(void);
-    void InitializeMap(void);
+    void InitializeLightMap(void);
+    void InitializeMetatiles(void);
     void LoadPalette(const void *data, int slot);
     void CreatePaletteTexture(void);
-    void CreateUnderlayTexture(unsigned int width, unsigned int height, const unsigned char *data);
     void CreateTexture(unsigned int width, unsigned int height, Texture &);
 
     void GenerateTexture(Texture &);
@@ -81,13 +77,14 @@ private:
 
     unsigned int mVAO;
     unsigned int mPickerVBO, mPickerEBO;
-    unsigned int mMapVBO, mMapEBO;
-    unsigned int mPickerShader, mMapShader;
-    Texture mPaletteTex, mTilesetTex, mUnderlayTex;
-    RenderTarget mPickerTex, mMapTex;
+    unsigned int mLightMapVBO, mLightMapEBO;
+    unsigned int mMetatileVBO, mMetatileEBO;
+    unsigned int mPickerShader, mLightMapShader;
+    Texture mPaletteTex, mTilesetTex;
+    RenderTarget mPickerTex, mLightMapTex, mMetatileTex;
 
-    MapVertex mMapVertices[MaxVertices];
-    unsigned int mMapQuadCount = 0;
+    LightMapVertex mLightMapVertices[MaxVertices];
+    unsigned int mLightMapQuadCount = 0;
 
     unsigned char mPickerPalNum = 0;
     bool mRedrawFlag = true;

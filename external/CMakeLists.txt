@@ -28,9 +28,9 @@ set(NFD_OVERRIDE_RECENT_WITH_DEFAULT ON)
 
 FetchContent_MakeAvailable(nfd)
 
-FetchContent_Declare(tomlplusplus
-    GIT_REPOSITORY "https://github.com/marzer/tomlplusplus/"
-    GIT_TAG v3.4.0
+FetchContent_Declare(json
+    GIT_REPOSITORY "https://github.com/nlohmann/json"
+    GIT_TAG v3.12.0
 )
 
-FetchContent_MakeAvailable(tomlplusplus)
+FetchContent_MakeAvailable(json)

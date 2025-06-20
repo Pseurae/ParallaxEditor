@@ -18,25 +18,6 @@ void CreateNewTilemap(int width, int height)
     action_stack_clear();
 }
 
-void TryLoadTilemap(void)
-{
-    static std::string s;
-    if (FileDialog::Open(FileDialog::Mode::Open, {{"Tilemap", "toml"}}, s, s))
-    {
-        global.context.Load(s);
-        global.renderer.ResizeMapTexture(global.context.GetWidth(), global.context.GetHeight());
-        global.renderer.Redraw();
-        action_stack_clear();
-    }
-}
-
-void TrySaveTilemap(void)
-{
-    static std::string p;
-    if (FileDialog::Open(FileDialog::Mode::Save, {{ "Tilemap", "toml" }}, p, p))
-        global.context.Save(p);
-}
-
 std::vector<Tile> LoadBinaryTilemap(const std::string &path)
 {
     std::vector<Tile> tiles{};
@@ -154,13 +135,6 @@ void OpenPaletteFolder(const std::string &s, int start, int end)
     }
 
     global.renderer.Redraw();
-}
-
-void TryLoadUnderlay(void)
-{
-    static std::string p;
-    if (FileDialog::Open(FileDialog::Mode::Open, {{ "Underlay", "png" }}, p, p))
-        global.renderer.LoadUnderlay(p);
 }
 
 template<class T>

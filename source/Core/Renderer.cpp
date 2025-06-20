@@ -19,11 +19,9 @@ void Renderer::Initialize(void)
     GenerateTexture(mTilesetTex);
     CreateTexture(128, 512, mTilesetTex);
 
-    GenerateTexture(mUnderlayTex);
-    LoadEmptyUnderlay();
-
     InitializePicker();
-    InitializeMap();
+    InitializeLightMap();
+    InitializeMetatiles();
 }
 
 void Renderer::InitializePicker(void)
@@ -43,9 +41,9 @@ void Renderer::InitializePicker(void)
     mPickerShader = CreateShader(tilesetVertexShaderSource, tilesetFragmentShaderSource);
 }
 
-void Renderer::InitializeMap(void)
+void Renderer::InitializeLightMap(void)
 {
-    GenerateRenderTarget(mMapTex);
+    GenerateRenderTarget(mLightMapTex);
 
     unsigned int quadIndices[MaxIndices];
     {
@@ -64,13 +62,43 @@ void Renderer::InitializeMap(void)
         }
     }
 
-    glGenBuffers(1, &mMapVBO);
-    glGenBuffers(1, &mMapEBO);
+    glGenBuffers(1, &mLightMapVBO);
+    glGenBuffers(1, &mLightMapEBO);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mMapEBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mLightMapEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * MaxIndices, quadIndices, GL_STATIC_DRAW);
 
-    mMapShader = CreateShader(mapVertexShaderSource, mapFragmentShaderSource);
+    mLightMapShader = CreateShader(mapVertexShaderSource, mapFragmentShaderSource);
+}
+
+void Renderer::InitializeMetatiles(void)
+{
+    GenerateRenderTarget(mMetatileTex);
+    SpecifyRenderTargetSize(mMetatileTex, 16, 65536);
+
+    unsigned int quadIndices[MaxIndices];
+    {
+        unsigned int offset = 0;
+        for (unsigned int i = 0; i < MaxIndices; i += 6)
+        {
+            quadIndices[i + 0] = offset + 0;
+            quadIndices[i + 1] = offset + 1;
+            quadIndices[i + 2] = offset + 2;
+
+            quadIndices[i + 3] = offset + 2;
+            quadIndices[i + 4] = offset + 3;
+            quadIndices[i + 5] = offset + 0;
+
+            offset += 4;
+        }
+    }
+
+    glGenBuffers(1, &mMetatileVBO);
+    glGenBuffers(1, &mMetatileEBO);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mMetatileEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * MaxIndices, quadIndices, GL_STATIC_DRAW);
+
 }
 
 void Renderer::Shutdown(void)
@@ -82,7 +110,8 @@ void Renderer::Shutdown(void)
     DeleteTexture(mTilesetTex);
 
     DeleteRenderTarget(mPickerTex);
-    DeleteRenderTarget(mMapTex);
+    DeleteRenderTarget(mLightMapTex);
+    DeleteRenderTarget(mMetatileTex);
 
     glDeleteVertexArrays(1, &mVAO);
 }
@@ -136,27 +165,6 @@ bool Renderer::LoadSecondaryTileset(const std::string &fname)
     return true;
 }
 
-bool Renderer::LoadUnderlay(const std::string &fname)
-{
-    int width = 0, height = 0, channels = 0;
-    stbi_set_flip_vertically_on_load(0);
-    unsigned char *data = stbi_load(fname.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-
-    if (!data)
-        return false;
-
-    // if (width != mMapTex.tex.width || height != mMapTex.tex.height)
-    // {
-    //     stbi_image_free(data);
-    //     return false;
-    // }
-
-    CreateUnderlayTexture(width, height, data);
-    stbi_image_free(data);
-
-    return true;
-}
-
 void Renderer::DrawTileset(void)
 {
     glUseProgram(mPickerShader);
@@ -190,22 +198,22 @@ void Renderer::DrawTileset(void)
 
 void Renderer::FlushTilemap(void)
 {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mMapEBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mLightMapEBO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, mMapVBO);
-    glBufferData(GL_ARRAY_BUFFER, mMapQuadCount * 4 * sizeof(MapVertex), mMapVertices, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, mLightMapVBO);
+    glBufferData(GL_ARRAY_BUFFER, mLightMapQuadCount * 4 * sizeof(LightMapVertex), mLightMapVertices, GL_STREAM_DRAW);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(MapVertex), (void *)offsetof(MapVertex, pos));
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(LightMapVertex), (void *)offsetof(LightMapVertex, pos));
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(MapVertex), (void *)offsetof(MapVertex, uv));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(LightMapVertex), (void *)offsetof(LightMapVertex, uv));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(MapVertex), (void *)offsetof(MapVertex, palette));
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(LightMapVertex), (void *)offsetof(LightMapVertex, palette));
     glEnableVertexAttribArray(2);
 
-    glUseProgram(mMapShader);
+    glUseProgram(mLightMapShader);
 
-    glUniform1i(glGetUniformLocation(mMapShader, "texture1"), 0);
-    glUniform1i(glGetUniformLocation(mMapShader, "texture2"), 1);
+    glUniform1i(glGetUniformLocation(mLightMapShader, "texture1"), 0);
+    glUniform1i(glGetUniformLocation(mLightMapShader, "texture2"), 1);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mTilesetTex.id);
@@ -213,14 +221,14 @@ void Renderer::FlushTilemap(void)
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, mPaletteTex.id);
 
-    glDrawElements(GL_TRIANGLES, mMapQuadCount * 6, GL_UNSIGNED_INT, 0);
-    mMapQuadCount = 0;
+    glDrawElements(GL_TRIANGLES, mLightMapQuadCount * 6, GL_UNSIGNED_INT, 0);
+    mLightMapQuadCount = 0;
 }
 
 void Renderer::DrawTilemap(const Context &ctx)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, mMapTex.fbo);
-    glViewport(0, 0, mMapTex.tex.width, mMapTex.tex.height);
+    glBindFramebuffer(GL_FRAMEBUFFER, mLightMapTex.fbo);
+    glViewport(0, 0, mLightMapTex.tex.width, mLightMapTex.tex.height);
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -238,7 +246,7 @@ void Renderer::Draw(const Context &ctx)
     if (!mRedrawFlag) 
         return;
 
-    mMapQuadCount = 0;
+    mLightMapQuadCount = 0;
     glBindVertexArray(mVAO);
     DrawTileset();
     DrawTilemap(ctx);
@@ -280,17 +288,6 @@ void Renderer::CreatePaletteTexture(void)
         LoadPalette(sDefaultPalette, i);
 
     glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-void Renderer::CreateUnderlayTexture(unsigned int width, unsigned int height, const unsigned char *data)
-{
-    glBindTexture(GL_TEXTURE_2D, mUnderlayTex.id);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    mUnderlayTex.width = width;
-    mUnderlayTex.height = height;
 }
 
 void Renderer::GenerateTexture(Texture &tex)
@@ -348,13 +345,8 @@ void Renderer::SpecifyRenderTargetSize(RenderTarget &target, int width, int heig
 
 void Renderer::ResizeMapTexture(int width, int height)
 {
-    SpecifyRenderTargetSize(mMapTex, width * 8, height * 8);
+    SpecifyRenderTargetSize(mLightMapTex, width * 8, height * 8);
     mRedrawFlag = true;
-}
-
-void Renderer::LoadEmptyUnderlay(void)
-{
-    CreateUnderlayTexture(1, 1, transparentUnderlayColors);
 }
 
 static const ImVec2 sTransformVectors[4] =
@@ -375,10 +367,10 @@ static inline void swap_val(T *v1, T *v2)
 
 void Renderer::BatchTile(unsigned short x, unsigned short y, const Tile &tile)
 {
-    if (mMapQuadCount >= MaxQuads)
+    if (mLightMapQuadCount >= MaxQuads)
         FlushTilemap();
 
-    auto mapSize = ImVec2(mMapTex.tex.width, mMapTex.tex.height);
+    auto mapSize = ImVec2(mLightMapTex.tex.width, mLightMapTex.tex.height);
     ImVec2 texCoords[4];
     {
         auto tileDim = ImVec2(128.0f, 512.0f);
@@ -417,17 +409,17 @@ void Renderer::BatchTile(unsigned short x, unsigned short y, const Tile &tile)
 
     for (int i = 0; i < 4; ++i)
     {
-        mMapVertices[i + mMapQuadCount * 4].pos = ((ImVec2(x, y) + sTransformVectors[i]) * 8.0f) /  mapSize;
-        mMapVertices[i + mMapQuadCount * 4].uv = texCoords[i];
-        mMapVertices[i + mMapQuadCount * 4].palette = tile.palette;
+        mLightMapVertices[i + mLightMapQuadCount * 4].pos = ((ImVec2(x, y) + sTransformVectors[i]) * 8.0f) /  mapSize;
+        mLightMapVertices[i + mLightMapQuadCount * 4].uv = texCoords[i];
+        mLightMapVertices[i + mLightMapQuadCount * 4].palette = tile.palette;
     }
-    mMapQuadCount++;
+    mLightMapQuadCount++;
 }
 
 void Renderer::BatchBackground(const Tile &tile)
 {
-    int xtiles = mMapTex.tex.width / 8, 
-        ytiles = mMapTex.tex.height / 8;
+    int xtiles = mLightMapTex.tex.width / 8, 
+        ytiles = mLightMapTex.tex.height / 8;
 
     for (int y = 0; y < ytiles; ++y)
     for (int x = 0; x < xtiles; ++x)

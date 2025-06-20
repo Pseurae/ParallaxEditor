@@ -31,7 +31,6 @@ static void ApplyTiles(unsigned int startX, unsigned int startY)
 static void TilemapWindow(void)
 {
     auto drawList = ImGui::GetWindowDrawList();
-    auto underlay = global.renderer.GetUnderlayTex();
     auto &brush = global.brush;
     const auto &tiles = global.context.GetTiles();
 
@@ -49,8 +48,6 @@ static void TilemapWindow(void)
     ImVec2 hoveredPos = ImVec2(0, 0);
 
     static ImVec2 sStartDrag = ImVec2(0, 0), sEndDrag = ImVec2(1, 1);
-
-    drawList->AddImage(underlay.id, ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + ImVec2(underlay.width, underlay.height) * scale);
 
     for (unsigned int y = 0; y < ytiles; ++y)
     for (unsigned int x = 0; x < xtiles; ++x)
