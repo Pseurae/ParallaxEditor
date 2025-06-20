@@ -7,6 +7,8 @@
 #include "Core/Snapshot.h"
 #include "UI/Helpers.h"
 
+ImRect GetSelectionRectFromDrag(ImVec2 start, ImVec2 end, const ImVec2 &tileSize);
+
 static void ApplyTiles(unsigned int startX, unsigned int startY)
 {
     auto &brush = global.brush;
@@ -20,35 +22,10 @@ static void ApplyTiles(unsigned int startX, unsigned int startY)
 
         int modifiedX = brush.xflip ? (brush.width - x - 1) : x;
         int modifiedY = brush.yflip ? (brush.height - y - 1) : y;
-        global.context.AddTile({modifiedX + startX, modifiedY + startY}, tile);
+        global.context.AddTile({x + startX, y + startY}, tile);
     }
 
     global.renderer.Redraw();
-}
-
-template<class T>
-static inline void swap_val(T *v1, T *v2)
-{
-    T temp = *v1;
-    *v1 = *v2;
-    *v2 = temp;
-}
-
-ImRect GetSelectionRectFromDrag(ImVec2 start, ImVec2 end, const ImVec2 &tileSize)
-{
-    if (start.x > end.x) swap_val(&start.x, &end.x);
-    if (start.y > end.y) swap_val(&start.y, &end.y);
-
-    start /= tileSize;
-    end /= tileSize;
-
-    start.x = std::floorf(start.x);
-    start.y = std::floorf(start.y);
-
-    end.x = std::ceilf(end.x);
-    end.y = std::ceilf(end.y);
-
-    return ImRect(start, end);
 }
 
 static void TilemapWindow(void)

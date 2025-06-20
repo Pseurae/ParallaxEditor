@@ -4,7 +4,7 @@
 
 struct Tile
 {
-    bool xflip, yflip;
+    bool xflip = false, yflip = false;
     unsigned short id;
     unsigned char palette;
 };

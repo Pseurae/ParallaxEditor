@@ -7,6 +7,10 @@
 #include <filesystem>
 #include <fstream>
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include <imgui.h>
+#include <imgui_internal.h>
+
 void CreateNewTilemap(int width, int height)
 {
     global.context.New(width, height);
@@ -157,4 +161,29 @@ void TryLoadUnderlay(void)
     static std::string p;
     if (FileDialog::Open(FileDialog::Mode::Open, {{ "Underlay", "png" }}, p, p))
         global.renderer.LoadUnderlay(p);
+}
+
+template<class T>
+static inline void swap_val(T *v1, T *v2)
+{
+    T temp = *v1;
+    *v1 = *v2;
+    *v2 = temp;
+}
+
+ImRect GetSelectionRectFromDrag(ImVec2 start, ImVec2 end, const ImVec2 &tileSize)
+{
+    if (start.x > end.x) swap_val(&start.x, &end.x);
+    if (start.y > end.y) swap_val(&start.y, &end.y);
+
+    start /= tileSize;
+    end /= tileSize;
+
+    start.x = std::floorf(start.x);
+    start.y = std::floorf(start.y);
+
+    end.x = std::ceilf(end.x);
+    end.y = std::ceilf(end.y);
+
+    return ImRect(start, end);
 }

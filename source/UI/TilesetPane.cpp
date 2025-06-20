@@ -4,6 +4,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+ImRect GetSelectionRectFromDrag(ImVec2 start, ImVec2 end, const ImVec2 &tileSize);
+
 void TilesetSelector(void)
 {
     auto drawList = ImGui::GetWindowDrawList();
@@ -19,8 +21,7 @@ void TilesetSelector(void)
     static constexpr float scale = 3.0f;
 
     bool hasHovered = false;
-    static int sStartDrag = 0;
-    static int sBrushWidth = 1, sBrushHeight = 1;
+    static ImVec2 sStartDrag = ImVec2(0, 0), sEndDrag = ImVec2(1, 1);
 
     for (int i = 0; i < 1024; ++i)
     {
@@ -41,7 +42,7 @@ void TilesetSelector(void)
         {
             if (mouseClicked)
             {
-                sStartDrag = i;
+                sStartDrag = ImGui::GetMousePos() - ImGui::GetCursorScreenPos();
                 global.brush.fromTileset = true;
             }
 
@@ -52,47 +53,35 @@ void TilesetSelector(void)
     if (hasHovered)
     {
         if (mouseDown)
-        {
-            auto delta = ImGui::GetMouseDragDelta();
-            sBrushWidth = std::max<int>(std::abs(delta.x) / (tileSize.x * scale), 0) + 1;
-            sBrushHeight = std::max<int>(std::abs(delta.y) / (tileSize.y * scale), 0) + 1;
-        }
+            sEndDrag = ImGui::GetMousePos() - ImGui::GetCursorScreenPos();
 
         if (mouseReleased)
         {
             brush.fromTileset = true;
-            brush.width = sBrushWidth;
-            brush.height = sBrushHeight;
+            ImRect selectionBox = GetSelectionRectFromDrag(sStartDrag, sEndDrag, tileSize * scale);
+            ImVec2 selectionSize = selectionBox.GetSize();
 
-            brush.selection.resize(sBrushWidth * sBrushHeight);
+            brush.width = selectionSize.x;
+            brush.height = selectionSize.y;
 
-            for (int y = 0; y < sBrushHeight; ++y)
-            for (int x = 0; x < sBrushWidth; ++x)
+            brush.selection.resize(brush.width * brush.height);
+
+            for (int y = 0; y < brush.height; ++y)
+            for (int x = 0; x < brush.width; ++x)
             {
-                int startX = sStartDrag % tilesInRow, 
-                    startY = sStartDrag / tilesInRow;
-                
                 Tile tile;
-                tile.id = (startX + x) + (startY + y) * tilesInRow;
+                tile.id = (int(selectionBox.Min.x) + x) + (int(selectionBox.Min.y) + y) * tilesInRow;
                 tile.palette = global.renderer.GetPickerPaletteNum();
 
-                brush.selection[x + y * sBrushWidth] = tile;
+                brush.selection[x + y * brush.width] = tile;
             }
         }
     }
 
     if (brush.fromTileset)
     {
-        int x = sStartDrag % tilesInRow, y = sStartDrag / tilesInRow;
-        ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tileSize * scale;
-        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + ImVec2(sBrushWidth, sBrushHeight) * tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
-    }
-    else if (brush.width == 1 && brush.height == 1)
-    {
-        const Tile &tile = global.brush.selection[0]; 
-        int x = tile.id % tilesInRow, y = tile.id / tilesInRow;
-        ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tileSize * scale;
-        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+        ImRect selectionBox = GetSelectionRectFromDrag(sStartDrag, sEndDrag, tileSize * scale);
+        drawList->AddRect(selectionBox.Min * tileSize * scale + ImGui::GetCursorScreenPos(), selectionBox.Max * tileSize * scale + ImGui::GetCursorScreenPos() + ImVec2(1, 1), IM_COL32(255, 255, 255, 255));
     }
 
     ImVec2 widgetsize = ImVec2(tilesInRow, 1024 / tilesInRow) * tileSize;
