@@ -22,7 +22,7 @@ static void ApplyTiles(unsigned int startX, unsigned int startY)
 
         int modifiedX = brush.xflip ? (brush.width - x - 1) : x;
         int modifiedY = brush.yflip ? (brush.height - y - 1) : y;
-        global.context.AddTile({x + startX, y + startY}, tile);
+        global.context.AddTile({modifiedX + startX, modifiedY + startY}, tile);
     }
 
     global.renderer.Redraw();

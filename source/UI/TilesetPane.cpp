@@ -83,6 +83,13 @@ void TilesetSelector(void)
         ImRect selectionBox = GetSelectionRectFromDrag(sStartDrag, sEndDrag, tileSize * scale);
         drawList->AddRect(selectionBox.Min * tileSize * scale + ImGui::GetCursorScreenPos(), selectionBox.Max * tileSize * scale + ImGui::GetCursorScreenPos() + ImVec2(1, 1), IM_COL32(255, 255, 255, 255));
     }
+    else if (brush.width == 1 && brush.height == 1)
+    {
+        const Tile &tile = global.brush.selection[0]; 
+        int x = tile.id % tilesInRow, y = tile.id / tilesInRow;
+        ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + ImVec2(x, y) * tileSize * scale;
+        drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+    }
 
     ImVec2 widgetsize = ImVec2(tilesInRow, 1024 / tilesInRow) * tileSize;
     ImRect bb(ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + widgetsize * scale + ImVec2(1.0f, 1.0f));
