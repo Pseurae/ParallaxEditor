@@ -162,11 +162,38 @@ ImRect GetSelectionRectFromDrag(ImVec2 start, ImVec2 end, const ImVec2 &tileSize
     return ImRect(start, end);
 }
 
+std::vector<unsigned short> LoadBinaryBlockData(const std::string &path)
+{
+    std::vector<unsigned short> tiles{};
+    std::ifstream fs(path, std::ios::binary);
+
+    while (true)
+    {
+        unsigned short tileEntry;
+        fs.read(reinterpret_cast<char *>(&tileEntry), 2);
+
+        if (fs.eof())
+            break;
+
+        tiles.push_back(tileEntry);
+    };
+
+    fs.close();
+    return tiles;
+}
+
 void TryOpenPrimaryMetatiles(void)
 {
-    auto tiles = LoadBinaryTilemap("testing/metatiles.bin");
-    global.renderer.LoadPrimaryMetatiles(tiles);
-    global.context.TilesetPaths()[0] = "testing/tiles.png";
-    global.renderer.LoadPrimaryTileset("testing/tiles.png");
+    auto primaryTiles = LoadBinaryTilemap("testing/general_metatiles.bin");
+    global.renderer.LoadPrimaryMetatiles(primaryTiles);
+    auto secondaryTiles = LoadBinaryTilemap("testing/petalburg_metatiles.bin");
+    global.renderer.LoadSecondaryMetatiles(secondaryTiles);
+
+    global.renderer.LoadPrimaryTileset("testing/general_tiles.png");
+    global.renderer.LoadSecondaryTileset("testing/petalburg_tiles.png");
+
     OpenPaletteFolder("testing/palettes", 0, 13);
+
+    global.renderer.ResizeMapTexture(70, 50);
+    global.renderer.LoadBlockData(LoadBinaryBlockData("testing/map.bin"));
 }

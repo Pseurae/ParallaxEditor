@@ -45,6 +45,8 @@ public:
     void ResizeMapTexture(int width, int height);
     void Redraw(void) { mRedrawFlag = true; }
 
+    void LoadBlockData(const std::vector<unsigned short> &blockData);
+
 private:
     static constexpr int MaxQuads = 20000;
     static constexpr int MaxVertices = 20000 * 4;
@@ -93,5 +95,8 @@ private:
     unsigned char mPickerPalNum = 0;
     bool mRedrawFlag = true;
 
-    std::array<Tile, 6144> mPrimaryMetatiles, mSecondaryMetatiles;
+    std::vector<unsigned short> mBlockData;
+    int mBlockDataWidth, mBlockDataHeight;
+
+    std::array<Tile, 24576> mPrimaryMetatiles{0}, mSecondaryMetatiles{0};
 };

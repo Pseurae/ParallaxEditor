@@ -34,6 +34,8 @@ static void TilemapWindow(void)
     auto &brush = global.brush;
     const auto &tiles = global.context.GetTiles();
 
+    auto &metatiles = global.renderer.GetMetatileTex();
+
     auto tex = global.renderer.GetMapTex();
 
     int xtiles = global.context.GetWidth(), 
@@ -48,6 +50,8 @@ static void TilemapWindow(void)
     ImVec2 hoveredPos = ImVec2(0, 0);
 
     static ImVec2 sStartDrag = ImVec2(0, 0), sEndDrag = ImVec2(1, 1);
+
+    drawList->AddImage(metatiles.id, ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + ImVec2(metatiles.width, metatiles.height) * scale);
 
     for (unsigned int y = 0; y < ytiles; ++y)
     for (unsigned int x = 0; x < xtiles; ++x)

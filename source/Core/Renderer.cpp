@@ -74,7 +74,7 @@ void Renderer::InitializeLightMap(void)
 void Renderer::InitializeMetatiles(void)
 {
     GenerateRenderTarget(mMetatileTex);
-    SpecifyRenderTargetSize(mMetatileTex, 16384, 16);
+    // SpecifyRenderTargetSize(mMetatileTex, 16384, 16);
 }
 
 void Renderer::Shutdown(void)
@@ -225,18 +225,24 @@ void Renderer::DrawMetatiles(void)
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    for (int i = 0; i < 1024; ++i)
-    for (int j = 0; j < 3; ++j)
-    for (int k = 0; k < 4; ++k)
+    const auto drawMetatile = [this](unsigned int i, unsigned int x, unsigned int y) {
+        for (int j = 0; j < 3; ++j)
+        for (int k = 0; k < 4; ++k)
+        {
+            int offsetX = (k % 2), offsetY = k / 2;
+
+            const Tile &tile = (i < 2048) ? 
+                mPrimaryMetatiles[k + j * 4 + i * 12] :
+                mSecondaryMetatiles[k + j * 4 + (i - 2048) * 12];
+
+            BatchTile(x + offsetX, y + offsetY, tile, mMetatileTex.tex.width, mMetatileTex.tex.height);
+        }
+    };
+
+    for (int y = 0; y < mBlockDataHeight; ++y)
+    for (int x = 0; x < mBlockDataWidth; ++x)
     {
-        int x = (k % 2) + i * 2,
-            y = k / 2;
-
-        const Tile &tile = (i >= 512) ? 
-            mPrimaryMetatiles[k + j * 4 + i * 12] :
-            mSecondaryMetatiles[k + j * 4 + (i - 512) * 12];
-
-        BatchTile(x, y, tile, mMetatileTex.tex.width, mMetatileTex.tex.height);
+        drawMetatile(mBlockData[y * mBlockDataWidth + x] & 0b111111111111, x * 2, y * 2);
     }
 
     FlushTilemap();
@@ -351,7 +357,12 @@ void Renderer::SpecifyRenderTargetSize(RenderTarget &target, int width, int heig
 
 void Renderer::ResizeMapTexture(int width, int height)
 {
-    SpecifyRenderTargetSize(mLightMapTex, width * 8, height * 8);
+    SpecifyRenderTargetSize(mLightMapTex, width * 16, height * 16);
+    SpecifyRenderTargetSize(mMetatileTex, width * 16, height * 16);
+
+    mBlockDataWidth = width;
+    mBlockDataHeight = height;
+
     mRedrawFlag = true;
 }
 
@@ -488,4 +499,9 @@ bool Renderer::LoadSecondaryMetatiles(const std::vector<Tile> &tiles)
     std::copy(tiles.begin(), tiles.end(), mSecondaryMetatiles.data());
     mRedrawFlag = true;
     return true;
+}
+
+void Renderer::LoadBlockData(const std::vector<unsigned short> &blockData)
+{
+    mBlockData = blockData;
 }
