@@ -74,31 +74,7 @@ void Renderer::InitializeLightMap(void)
 void Renderer::InitializeMetatiles(void)
 {
     GenerateRenderTarget(mMetatileTex);
-    SpecifyRenderTargetSize(mMetatileTex, 16, 65536);
-
-    unsigned int quadIndices[MaxIndices];
-    {
-        unsigned int offset = 0;
-        for (unsigned int i = 0; i < MaxIndices; i += 6)
-        {
-            quadIndices[i + 0] = offset + 0;
-            quadIndices[i + 1] = offset + 1;
-            quadIndices[i + 2] = offset + 2;
-
-            quadIndices[i + 3] = offset + 2;
-            quadIndices[i + 4] = offset + 3;
-            quadIndices[i + 5] = offset + 0;
-
-            offset += 4;
-        }
-    }
-
-    glGenBuffers(1, &mMetatileVBO);
-    glGenBuffers(1, &mMetatileEBO);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mMetatileEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * MaxIndices, quadIndices, GL_STATIC_DRAW);
-
+    SpecifyRenderTargetSize(mMetatileTex, 16384, 16);
 }
 
 void Renderer::Shutdown(void)
@@ -235,7 +211,33 @@ void Renderer::DrawTilemap(const Context &ctx)
 
     BatchBackground(ctx.GetDefaultTile());
     for (const auto &[pos, tile] : ctx.GetTiles())
-        BatchTile(pos.x, pos.y, tile);
+        BatchTile(pos.x, pos.y, tile, mLightMapTex.tex.width, mLightMapTex.tex.height);
+
+    FlushTilemap();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::DrawMetatiles(void)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, mMetatileTex.fbo);
+    glViewport(0, 0, mMetatileTex.tex.width, mMetatileTex.tex.height);
+
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    for (int i = 0; i < 1024; ++i)
+    for (int j = 0; j < 3; ++j)
+    for (int k = 0; k < 4; ++k)
+    {
+        int x = (k % 2) + i * 2,
+            y = k / 2;
+
+        const Tile &tile = (i >= 512) ? 
+            mPrimaryMetatiles[k + j * 4 + i * 12] :
+            mSecondaryMetatiles[k + j * 4 + (i - 512) * 12];
+
+        BatchTile(x, y, tile, mMetatileTex.tex.width, mMetatileTex.tex.height);
+    }
 
     FlushTilemap();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -246,10 +248,14 @@ void Renderer::Draw(const Context &ctx)
     if (!mRedrawFlag) 
         return;
 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
     mLightMapQuadCount = 0;
     glBindVertexArray(mVAO);
     DrawTileset();
     DrawTilemap(ctx);
+    DrawMetatiles();
     mRedrawFlag = false;
 }
 
@@ -365,12 +371,12 @@ static inline void swap_val(T *v1, T *v2)
     *v2 = temp;
 }
 
-void Renderer::BatchTile(unsigned short x, unsigned short y, const Tile &tile)
+void Renderer::BatchTile(unsigned short x, unsigned short y, const Tile &tile, int width, int height)
 {
     if (mLightMapQuadCount >= MaxQuads)
         FlushTilemap();
 
-    auto mapSize = ImVec2(mLightMapTex.tex.width, mLightMapTex.tex.height);
+    auto mapSize = ImVec2(width, height);
     ImVec2 texCoords[4];
     {
         auto tileDim = ImVec2(128.0f, 512.0f);
@@ -424,7 +430,7 @@ void Renderer::BatchBackground(const Tile &tile)
     for (int y = 0; y < ytiles; ++y)
     for (int x = 0; x < xtiles; ++x)
     {
-        BatchTile(x, y, tile);
+        BatchTile(x, y, tile, mLightMapTex.tex.width, mLightMapTex.tex.height);
     }
 }
 
@@ -468,4 +474,18 @@ unsigned int CreateShader(const char *v, const char *f)
     glLinkProgram(shaderProgram);
 
     return shaderProgram;
+}
+
+bool Renderer::LoadPrimaryMetatiles(const std::vector<Tile> &tiles)
+{
+    std::copy(tiles.begin(), tiles.end(), mPrimaryMetatiles.data());
+    mRedrawFlag = true;
+    return true;
+}
+
+bool Renderer::LoadSecondaryMetatiles(const std::vector<Tile> &tiles)
+{
+    std::copy(tiles.begin(), tiles.end(), mSecondaryMetatiles.data());
+    mRedrawFlag = true;
+    return true;
 }

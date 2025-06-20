@@ -29,7 +29,10 @@ public:
 
     const Texture &GetPickerTex(void) const { return mPickerTex.tex; }
     const Texture &GetMapTex(void) const { return mLightMapTex.tex; }
+    const Texture &GetMetatileTex(void) const { return mMetatileTex.tex; }
 
+    bool LoadPrimaryMetatiles(const std::vector<Tile> &tiles);
+    bool LoadSecondaryMetatiles(const std::vector<Tile> &tiles);
     bool LoadPrimaryTileset(const std::string &fname);
     bool LoadSecondaryTileset(const std::string &fname);
     void Draw(const Context &ctx);
@@ -57,6 +60,7 @@ private:
     void DrawTileset(void);
     void FlushTilemap(void);
     void DrawTilemap(const Context &ctx);
+    void DrawMetatiles(void);
 
     void InitializePicker(void);
     void InitializeLightMap(void);
@@ -72,7 +76,7 @@ private:
     void DeleteRenderTarget(const RenderTarget &);
     void SpecifyRenderTargetSize(RenderTarget &, int, int);
 
-    void BatchTile(unsigned short x, unsigned short y, const Tile &tile);
+    void BatchTile(unsigned short x, unsigned short y, const Tile &tile, int width, int height);
     void BatchBackground(const Tile &tile);
 
     unsigned int mVAO;
@@ -88,4 +92,6 @@ private:
 
     unsigned char mPickerPalNum = 0;
     bool mRedrawFlag = true;
+
+    std::array<Tile, 6144> mPrimaryMetatiles, mSecondaryMetatiles;
 };

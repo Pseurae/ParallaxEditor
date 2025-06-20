@@ -161,3 +161,12 @@ ImRect GetSelectionRectFromDrag(ImVec2 start, ImVec2 end, const ImVec2 &tileSize
 
     return ImRect(start, end);
 }
+
+void TryOpenPrimaryMetatiles(void)
+{
+    auto tiles = LoadBinaryTilemap("testing/metatiles.bin");
+    global.renderer.LoadPrimaryMetatiles(tiles);
+    global.context.TilesetPaths()[0] = "testing/tiles.png";
+    global.renderer.LoadPrimaryTileset("testing/tiles.png");
+    OpenPaletteFolder("testing/palettes", 0, 13);
+}
