@@ -5,6 +5,7 @@
 #include "Global.h"
 #include <iostream>
 #include "Core/Snapshot.h"
+#include "UI/Helpers.h"
 
 static void ApplyTiles(unsigned int startX, unsigned int startY)
 {
@@ -23,6 +24,31 @@ static void ApplyTiles(unsigned int startX, unsigned int startY)
     }
 
     global.renderer.Redraw();
+}
+
+template<class T>
+static inline void swap_val(T *v1, T *v2)
+{
+    T temp = *v1;
+    *v1 = *v2;
+    *v2 = temp;
+}
+
+ImRect GetSelectionRectFromDrag(ImVec2 start, ImVec2 end, const ImVec2 &tileSize)
+{
+    if (start.x > end.x) swap_val(&start.x, &end.x);
+    if (start.y > end.y) swap_val(&start.y, &end.y);
+
+    start /= tileSize;
+    end /= tileSize;
+
+    start.x = std::floorf(start.x);
+    start.y = std::floorf(start.y);
+
+    end.x = std::ceilf(end.x);
+    end.y = std::ceilf(end.y);
+
+    return ImRect(start, end);
 }
 
 static void TilemapWindow(void)
@@ -45,8 +71,7 @@ static void TilemapWindow(void)
     bool hasHovered = false;
     ImVec2 hoveredPos = ImVec2(0, 0);
 
-    static ImVec2 sStartDrag = ImVec2(0, 0);
-    static int sBrushWidth = 1, sBrushHeight = 1;
+    static ImVec2 sStartDrag = ImVec2(0, 0), sEndDrag = ImVec2(1, 1);
 
     drawList->AddImage(underlay.id, ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + ImVec2(underlay.width, underlay.height) * scale);
 
@@ -62,7 +87,7 @@ static void TilemapWindow(void)
         if (hovered)
         {
             if (ImGui::IsMouseClicked(1))
-                sStartDrag = ImVec2(x, y);
+                sStartDrag = ImGui::GetMousePos() - ImGui::GetCursorScreenPos();
 
             hasHovered = true;
             hoveredPos = ImVec2(x, y);
@@ -90,12 +115,9 @@ static void TilemapWindow(void)
 
         if (ImGui::IsMouseDown(1))
         {
-            auto delta = ImGui::GetMouseDragDelta(1);
-            sBrushWidth = std::max<int>(std::abs(delta.x) / (tileSize.x * scale), 0) + 1;
-            sBrushHeight = std::max<int>(std::abs(delta.y) / (tileSize.y * scale), 0) + 1;
-
-            ImVec2 pos = ImGui::GetCursorScreenPos() + ImVec2(0.5f, 0.5f) + sStartDrag * tileSize * scale;
-            drawList->AddRect(pos - ImVec2(0.5f, 0.5f), pos + ImVec2(sBrushWidth, sBrushHeight) * tileSize * scale + ImVec2(0.5f, 0.5f), IM_COL32(255, 255, 255, 255));
+            sEndDrag = ImGui::GetMousePos() - ImGui::GetCursorScreenPos();
+            ImRect selectionBox = GetSelectionRectFromDrag(sStartDrag, sEndDrag, tileSize * scale);
+            drawList->AddRect(selectionBox.Min * tileSize * scale + ImGui::GetCursorScreenPos(), selectionBox.Max * tileSize * scale + ImGui::GetCursorScreenPos() + ImVec2(1, 1), IM_COL32(255, 255, 255, 255));
         }
         else
         {
@@ -106,24 +128,27 @@ static void TilemapWindow(void)
         if (ImGui::IsMouseReleased(1))
         {
             brush.fromTileset = false;
-            brush.width = sBrushWidth;
-            brush.height = sBrushHeight;
+            ImRect selectionBox = GetSelectionRectFromDrag(sStartDrag, sEndDrag, tileSize * scale);
+            ImVec2 selectionSize = selectionBox.GetSize();
+
+            brush.width = selectionSize.x;
+            brush.height = selectionSize.y;
 
             brush.xflip = false;
             brush.yflip = false;
 
-            brush.selection.resize(sBrushWidth * sBrushHeight);
+            brush.selection.resize(brush.width * brush.height);
 
-            for (int y = 0; y < sBrushHeight; ++y)
-            for (int x = 0; x < sBrushWidth; ++x)
+            for (int y = 0; y < brush.height; ++y)
+            for (int x = 0; x < brush.width; ++x)
             {
-                TilePosition pos = {(unsigned int)(sStartDrag.x + x), (unsigned int)(sStartDrag.y + y)};
-                brush.selection[x + y * sBrushWidth] = tiles.contains(pos) ? tiles.at(pos) : global.context.GetDefaultTile();
+                TilePosition pos = {(unsigned int)(selectionBox.Min.x + x), (unsigned int)(selectionBox.Min.y + y)};
+                brush.selection[x + y * brush.width] = tiles.contains(pos) ? tiles.at(pos) : global.context.GetDefaultTile();
 
-                if (sBrushHeight == 1 && sBrushWidth == 1)
+                if (brush.height == 1 && brush.width == 1)
                 {
-                    brush.xflip = brush.selection[x + y * sBrushWidth].xflip;
-                    brush.yflip = brush.selection[x + y * sBrushWidth].yflip;
+                    brush.xflip = brush.selection[x + y * brush.width].xflip;
+                    brush.yflip = brush.selection[x + y * brush.width].yflip;
                 }
             }
         }

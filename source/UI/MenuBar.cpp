@@ -1,6 +1,6 @@
+#include "UI/Helpers.h"
 #include <imgui.h>
 #include "Global.h"
-#include "UI/Helpers.h"
 #include "UI/Popups/ImportTilemap.h"
 #include "UI/Popups/NewTilemap.h"
 #include "UI/Popups/Palettes.h"
