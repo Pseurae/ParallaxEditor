@@ -14,6 +14,13 @@ struct Layout
     std::string blockDataPath;
 };
 
+struct Tileset
+{
+    std::string tilesPath;
+    std::vector<std::string> palettePaths;
+    std::string metatilesPath;
+};
+
 class Context final
 {
 public:
@@ -60,6 +67,10 @@ public:
 
     std::string PathWithRoot(const std::string &fname);
     const auto &GetMapLayout(const std::string &mapName) { return mLayouts[mMapToLayoutId[mapName]]; }
+    const auto &GetTileset(const std::string &tname) { return mTilesets[tname]; }
+
+    const auto &GetCurrentMap(void) { return mCurrentMap; }
+    void SetCurrentMap(const std::string &name) { mCurrentMap = name; }
 
 private:
     std::string LoadTextFile(const std::string &fname);
@@ -67,8 +78,14 @@ private:
     void LoadLayouts(void);
     void LoadMaps(void);
     void LinkMapsToLayouts(void);
+    void LoadTilesets(void);
+
+    std::string GetIncBinFromSymbol(const std::string &fname, const std::string &sym, const std::string &ext = "");
+    std::vector<std::string> GetIncBinArrayFromSymbol(const std::string &fname, const std::string &sym, const std::string &ext = "");
 
     std::string mProjectPath;
+
+    std::string mCurrentMap;
 
     unsigned short mWidth = 0, mHeight = 0;
     Tile mDefaultTile;
@@ -85,6 +102,7 @@ private:
     std::unordered_map<std::string, std::vector<std::string>> mGroupedMaps;
 
     std::unordered_map<std::string, std::string> mMapToLayoutId;
+    std::unordered_map<std::string, Tileset> mTilesets;
 
     bool mIs8BPP = false;
     bool mDirty = false;

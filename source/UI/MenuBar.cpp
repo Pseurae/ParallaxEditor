@@ -10,14 +10,11 @@ void MainMenuBar(void)
     {
         if (ImGui::BeginMenu("Tilemap"))
         {
-            if (ImGui::MenuItem("Save Tilemap", nullptr, nullptr))
+            if (ImGui::MenuItem("Save Tilemap", nullptr, nullptr, global.context.IsMapLoaded() && global.context.IsProjectLoaded()))
                 TryExportTilemap();
 
             if (ImGui::MenuItem("Open Project", nullptr, nullptr))
                 TryOpenProjectFolder();
-
-            if (ImGui::MenuItem("Open Metatiles"))
-                TryOpenPrimaryMetatiles();
 
             ImGui::EndMenu();
         }

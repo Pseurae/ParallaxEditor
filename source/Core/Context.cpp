@@ -6,6 +6,8 @@
 #include "Context.h"
 #include "ParallaxEditor.h"
 #include <nlohmann/json.hpp>
+#include <fex/lexer.h>
+#include <fex/parser.h>
 #include <regex>
 
 using json = nlohmann::json;
@@ -24,10 +26,10 @@ void Context::Import(const std::vector<Tile> &tiles, int width, int height)
     mHeight = height;
 
     mTiles.clear();
-    for (unsigned int y = 0; y < height; ++y)
-    for (unsigned int x = 0; x < width; ++x)
+    for (unsigned int y = 0; y < height * 2; ++y)
+    for (unsigned int x = 0; x < width * 2; ++x)
     {
-        mTiles[TilePosition{x, y}] = tiles[x + y * width];
+        mTiles[TilePosition{x, y}] = tiles[x + y * (width * 2)];
     }
 
     mMapLoaded = true;
@@ -82,6 +84,7 @@ void Context::OpenProjectFolder(const std::string &fname)
     LoadLayouts();
     LoadMaps();
     LinkMapsToLayouts();
+    LoadTilesets();
 }
 
 void Context::LoadBlockData(const std::vector<unsigned short> &blockData)
@@ -164,4 +167,87 @@ void Context::LinkMapsToLayouts(void)
         if (!layoutName.empty())
             mMapToLayoutId[mapName] = layoutName;
     }
+}
+
+void Context::LoadTilesets(void)
+{
+    std::string filePath = PathWithRoot("src/data/tilesets/headers.h");
+    auto cParser = fex::Parser();
+    auto tokens = fex::Lexer().LexFile(filePath);
+    auto topLevelObjects = cParser.ParseTopLevelObjects(tokens);
+
+    for (auto it = topLevelObjects.begin(); it != topLevelObjects.end(); it++) 
+    {
+        std::string structLabel = it->first;
+        if (structLabel.empty()) continue;
+
+        Tileset t;
+        for (const fex::ArrayValue &v : it->second.values()) 
+        {
+            if (v.type() == fex::ArrayValue::Type::kValuePair) 
+            {
+                std::string key = v.pair().first;
+                std::string value = v.pair().second->ToString();
+
+                if (key == "tiles") t.tilesPath = GetIncBinFromSymbol("src/data/tilesets/graphics.h", value, "png");
+                else if (key == "metatiles") t.metatilesPath = GetIncBinFromSymbol("src/data/tilesets/metatiles.h", value, "bin");
+                else if (key == "palettes") t.palettePaths = GetIncBinArrayFromSymbol("src/data/tilesets/graphics.h", value, "pal");
+            }
+        }
+
+        mTilesets[structLabel] = t;
+    }
+}
+
+std::string Context::GetIncBinFromSymbol(const std::string &fname, const std::string &sym, const std::string &ext)
+{
+    std::string path{};
+    auto text = LoadTextFile(PathWithRoot(fname));
+
+    std::regex re("\\b" + sym + "\\b\\s*\\[\\]\\s*=\\s*INCBIN_[US][0-9]+\\s*\\(\\s*\"([^\"]*)\"\\s*\\)");
+    std::smatch base_match;
+
+    if (std::regex_search(text, base_match, re))
+    {
+        if (base_match.size() == 2)
+        {
+            path = base_match[1].str();
+            if (!ext.empty())
+                path = path.substr(0, path.find_first_of(".")) + "." + ext;
+        }
+    }
+
+    return path;
+}
+
+std::vector<std::string> Context::GetIncBinArrayFromSymbol(const std::string &fname, const std::string &sym, const std::string &ext)
+{
+    std::vector<std::string> paths{};
+    if (sym.empty())
+        return paths;
+
+    auto text = LoadTextFile(PathWithRoot(fname));
+    std::regex re(sym + "\\s*\\[([^;]*?)\\};");
+    std::smatch base_match;
+
+    if (!(std::regex_search(text, base_match, re) && base_match.size() == 2))
+        return paths;
+
+    text = base_match[1].str();
+
+    std::regex incbin_re("INCBIN_[SU][0-9]+\\s*\\(\\s*\"(.+)\"\\s*\\)");
+    auto words_begin = std::sregex_iterator(text.begin(), text.end(), incbin_re);
+    auto words_end = std::sregex_iterator();
+ 
+    for (std::sregex_iterator i = words_begin; i != words_end; ++i)
+    {
+        std::smatch match = *i;
+        std::string path = match[1].str();
+
+        if (!ext.empty())
+            path = path.substr(0, path.find_first_of(".")) + "." + ext;
+        paths.push_back(path);
+    }
+
+    return paths;
 }

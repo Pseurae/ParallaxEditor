@@ -52,9 +52,8 @@ void TryImportTilemap(const std::vector<Tile> &tiles, int width)
 
 void TryExportTilemap(void)
 {
-    static std::string p;
-    if (FileDialog::Open(FileDialog::Mode::Save, {{ "Tilemap", "bin" }}, p, p))
-        global.context.Export(p);
+    auto path = global.context.PathWithRoot("data/layouts/" + global.context.GetCurrentMap() + "/lighting.bin");
+    global.context.Export(path);
 }
 
 void TryOpenProjectFolder(void)
@@ -182,37 +181,43 @@ std::vector<unsigned short> LoadBinaryBlockData(const std::string &path)
     return tiles;
 }
 
-void TryOpenPrimaryMetatiles(void)
-{
-    auto primaryTiles = LoadBinaryTilemap("testing/general_metatiles.bin");
-    global.context.LoadPrimaryMetatiles(primaryTiles);
-    auto secondaryTiles = LoadBinaryTilemap("testing/petalburg_metatiles.bin");
-    global.context.LoadSecondaryMetatiles(secondaryTiles);
-
-    TryLoadPrimaryTileset("testing/general_tiles.png");
-    TryLoadSecondaryTileset("testing/petalburg_tiles.png");
-
-    OpenPaletteFolder("testing/palettes", 0, 13);
-
-    // global.context.New(70, 50);
-    // global.renderer.ResizeMapTexture(70, 50);
-    // global.context.LoadBlockData(LoadBinaryBlockData("testing/map.bin"));
-}
-
 void TryOpenMap(const std::string &mapName)
 {
-    auto primaryTiles = LoadBinaryTilemap("testing/general_metatiles.bin");
+    global.context.SetCurrentMap(mapName);
+    const auto &layout = global.context.GetMapLayout(mapName);
+    const auto &primaryTileset = global.context.GetTileset(layout.primaryTileset);
+    const auto &secondaryTileset = global.context.GetTileset(layout.secondaryTileset);
+
+    auto primaryTiles = LoadBinaryTilemap(global.context.PathWithRoot(primaryTileset.metatilesPath));
     global.context.LoadPrimaryMetatiles(primaryTiles);
-    auto secondaryTiles = LoadBinaryTilemap("testing/petalburg_metatiles.bin");
+
+    auto secondaryTiles = LoadBinaryTilemap(global.context.PathWithRoot(secondaryTileset.metatilesPath));
     global.context.LoadSecondaryMetatiles(secondaryTiles);
 
-    TryLoadPrimaryTileset("testing/general_tiles.png");
-    TryLoadSecondaryTileset("testing/petalburg_tiles.png");
+    TryLoadPrimaryTileset(global.context.PathWithRoot(primaryTileset.tilesPath));
+    TryLoadSecondaryTileset(global.context.PathWithRoot(secondaryTileset.tilesPath));
 
-    OpenPaletteFolder("testing/palettes", 0, 13);
+    std::string lightmapPath = global.context.PathWithRoot("data/layouts/" + mapName + "/lighting.bin");
+    bool lightmapExists = std::filesystem::exists(lightmapPath);
 
-    const auto &layout = global.context.GetMapLayout(mapName);
-    global.context.New(layout.width, layout.height);
+    if (!lightmapExists)
+        global.context.New(layout.width, layout.height);
+    else
+        global.context.Import(LoadBinaryTilemap(lightmapPath), layout.width, layout.height);
+
     global.renderer.ResizeMapTexture(layout.width, layout.height);
     global.context.LoadBlockData(LoadBinaryBlockData(global.context.PathWithRoot(layout.blockDataPath)));
+
+    for (int i = 0; i < 13; ++i)
+    {
+        std::string palPath;
+
+        if (i < 6) palPath = primaryTileset.palettePaths[i];
+        else palPath = secondaryTileset.palettePaths[i];
+
+        palPath = global.context.PathWithRoot(palPath);
+
+        global.context.PalettePaths()[i] = palPath;
+        global.renderer.LoadPalette(Palette(palPath), i);
+    }
 }
