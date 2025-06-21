@@ -217,7 +217,7 @@ void Renderer::DrawTilemap(const Context &ctx)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::DrawMetatiles(void)
+void Renderer::DrawMetatiles(const Context &ctx)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, mMetatileTex.fbo);
     glViewport(0, 0, mMetatileTex.tex.width, mMetatileTex.tex.height);
@@ -239,10 +239,12 @@ void Renderer::DrawMetatiles(void)
         }
     };
 
-    for (int y = 0; y < mBlockDataHeight; ++y)
-    for (int x = 0; x < mBlockDataWidth; ++x)
+    const auto &blockData = ctx.GetBlockData();
+
+    for (int y = 0; y < ctx.GetWidth(); ++y)
+    for (int x = 0; x < ctx.GetHeight(); ++x)
     {
-        drawMetatile(mBlockData[y * mBlockDataWidth + x] & 0b111111111111, x * 2, y * 2);
+        drawMetatile(blockData[y * ctx.GetWidth() + x] & 0b111111111111, x * 2, y * 2);
     }
 
     FlushTilemap();
@@ -261,7 +263,7 @@ void Renderer::Draw(const Context &ctx)
     glBindVertexArray(mVAO);
     DrawTileset();
     DrawTilemap(ctx);
-    DrawMetatiles();
+    DrawMetatiles(ctx);
     mRedrawFlag = false;
 }
 
@@ -359,9 +361,6 @@ void Renderer::ResizeMapTexture(int width, int height)
 {
     SpecifyRenderTargetSize(mLightMapTex, width * 16, height * 16);
     SpecifyRenderTargetSize(mMetatileTex, width * 16, height * 16);
-
-    mBlockDataWidth = width;
-    mBlockDataHeight = height;
 
     mRedrawFlag = true;
 }
@@ -499,9 +498,4 @@ bool Renderer::LoadSecondaryMetatiles(const std::vector<Tile> &tiles)
     std::copy(tiles.begin(), tiles.end(), mSecondaryMetatiles.data());
     mRedrawFlag = true;
     return true;
-}
-
-void Renderer::LoadBlockData(const std::vector<unsigned short> &blockData)
-{
-    mBlockData = blockData;
 }

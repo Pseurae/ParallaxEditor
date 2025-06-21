@@ -99,3 +99,8 @@ void Context::OpenProjectFolder(const std::string &fname)
 
     mProjectLoaded = true;
 }
+
+void Context::LoadBlockData(const std::vector<unsigned short> &blockData)
+{
+    mBlockData = blockData;
+}

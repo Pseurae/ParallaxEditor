@@ -62,7 +62,7 @@ private:
     void DrawTileset(void);
     void FlushTilemap(void);
     void DrawTilemap(const Context &ctx);
-    void DrawMetatiles(void);
+    void DrawMetatiles(const Context &ctx);
 
     void InitializePicker(void);
     void InitializeLightMap(void);
@@ -94,9 +94,6 @@ private:
 
     unsigned char mPickerPalNum = 0;
     bool mRedrawFlag = true;
-
-    std::vector<unsigned short> mBlockData;
-    int mBlockDataWidth, mBlockDataHeight;
 
     std::array<Tile, 24576> mPrimaryMetatiles{0}, mSecondaryMetatiles{0};
 };

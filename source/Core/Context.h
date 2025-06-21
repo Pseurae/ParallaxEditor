@@ -43,10 +43,13 @@ public:
     const auto &GetPrimaryTilesets() { return mPrimaryTilesets; }
     const auto &GetSecondaryTilesets() { return mSecondaryTilesets; }
 
+    const auto &GetBlockData() const { return mBlockData; }
+    void LoadBlockData(const std::vector<unsigned short> &blockData);
+
 private:
     std::string mPath;
 
-    unsigned short mWidth, mHeight;
+    unsigned short mWidth = 0, mHeight = 0;
     Tile mDefaultTile;
     std::unordered_map<TilePosition, Tile> mTiles;
 
@@ -55,6 +58,8 @@ private:
 
     std::vector<std::string> mPrimaryTilesets;
     std::vector<std::string> mSecondaryTilesets;
+
+    std::vector<unsigned short> mBlockData;
 
     bool mIs8BPP = false;
     bool mDirty = false;
