@@ -40,9 +40,6 @@ public:
 
     void AddTile(const TilePosition &pos, const Tile &tile);
 
-    const auto &GetPrimaryTilesets() { return mPrimaryTilesets; }
-    const auto &GetSecondaryTilesets() { return mSecondaryTilesets; }
-
     const auto &GetBlockData() const { return mBlockData; }
     void LoadBlockData(const std::vector<unsigned short> &blockData);
 
@@ -61,9 +58,6 @@ private:
 
     std::array<std::string, 16> mPalettePaths;
     std::array<std::string, 2> mTilesetPaths;
-
-    std::vector<std::string> mPrimaryTilesets;
-    std::vector<std::string> mSecondaryTilesets;
 
     std::vector<unsigned short> mBlockData;
     std::array<Tile, 24576> mPrimaryMetatiles{0}, mSecondaryMetatiles{0};

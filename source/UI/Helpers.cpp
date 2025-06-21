@@ -189,8 +189,8 @@ void TryOpenPrimaryMetatiles(void)
     auto secondaryTiles = LoadBinaryTilemap("testing/petalburg_metatiles.bin");
     global.context.LoadSecondaryMetatiles(secondaryTiles);
 
-    global.renderer.LoadPrimaryTileset("testing/general_tiles.png");
-    global.renderer.LoadSecondaryTileset("testing/petalburg_tiles.png");
+    TryLoadPrimaryTileset("testing/general_tiles.png");
+    TryLoadSecondaryTileset("testing/petalburg_tiles.png");
 
     OpenPaletteFolder("testing/palettes", 0, 13);
 
