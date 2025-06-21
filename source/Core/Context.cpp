@@ -104,3 +104,13 @@ void Context::LoadBlockData(const std::vector<unsigned short> &blockData)
 {
     mBlockData = blockData;
 }
+
+void Context::LoadPrimaryMetatiles(const std::vector<Tile> &tiles)
+{
+    std::copy(tiles.begin(), tiles.end(), mPrimaryMetatiles.data());
+}
+
+void Context::LoadSecondaryMetatiles(const std::vector<Tile> &tiles)
+{
+    std::copy(tiles.begin(), tiles.end(), mSecondaryMetatiles.data());
+}

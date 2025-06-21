@@ -31,8 +31,6 @@ public:
     const Texture &GetMapTex(void) const { return mLightMapTex.tex; }
     const Texture &GetMetatileTex(void) const { return mMetatileTex.tex; }
 
-    bool LoadPrimaryMetatiles(const std::vector<Tile> &tiles);
-    bool LoadSecondaryMetatiles(const std::vector<Tile> &tiles);
     bool LoadPrimaryTileset(const std::string &fname);
     bool LoadSecondaryTileset(const std::string &fname);
     void Draw(const Context &ctx);
@@ -94,6 +92,4 @@ private:
 
     unsigned char mPickerPalNum = 0;
     bool mRedrawFlag = true;
-
-    std::array<Tile, 24576> mPrimaryMetatiles{0}, mSecondaryMetatiles{0};
 };

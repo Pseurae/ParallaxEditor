@@ -225,15 +225,15 @@ void Renderer::DrawMetatiles(const Context &ctx)
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const auto drawMetatile = [this](unsigned int i, unsigned int x, unsigned int y) {
+    const auto drawMetatile = [this, ctx](unsigned int i, unsigned int x, unsigned int y) {
         for (int j = 0; j < 3; ++j)
         for (int k = 0; k < 4; ++k)
         {
             int offsetX = (k % 2), offsetY = k / 2;
 
             const Tile &tile = (i < 2048) ? 
-                mPrimaryMetatiles[k + j * 4 + i * 12] :
-                mSecondaryMetatiles[k + j * 4 + (i - 2048) * 12];
+                ctx.GetPrimaryMetatiles()[k + j * 4 + i * 12] :
+                ctx.GetSecondaryMetatiles()[k + j * 4 + (i - 2048) * 12];
 
             BatchTile(x + offsetX, y + offsetY, tile, mMetatileTex.tex.width, mMetatileTex.tex.height);
         }
@@ -486,16 +486,3 @@ unsigned int CreateShader(const char *v, const char *f)
     return shaderProgram;
 }
 
-bool Renderer::LoadPrimaryMetatiles(const std::vector<Tile> &tiles)
-{
-    std::copy(tiles.begin(), tiles.end(), mPrimaryMetatiles.data());
-    mRedrawFlag = true;
-    return true;
-}
-
-bool Renderer::LoadSecondaryMetatiles(const std::vector<Tile> &tiles)
-{
-    std::copy(tiles.begin(), tiles.end(), mSecondaryMetatiles.data());
-    mRedrawFlag = true;
-    return true;
-}

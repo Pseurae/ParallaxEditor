@@ -46,6 +46,12 @@ public:
     const auto &GetBlockData() const { return mBlockData; }
     void LoadBlockData(const std::vector<unsigned short> &blockData);
 
+    void LoadPrimaryMetatiles(const std::vector<Tile> &tiles);
+    void LoadSecondaryMetatiles(const std::vector<Tile> &tiles);
+
+    const auto &GetPrimaryMetatiles(void) const { return mPrimaryMetatiles; }
+    const auto &GetSecondaryMetatiles(void) const { return mSecondaryMetatiles; }
+
 private:
     std::string mPath;
 
@@ -60,6 +66,7 @@ private:
     std::vector<std::string> mSecondaryTilesets;
 
     std::vector<unsigned short> mBlockData;
+    std::array<Tile, 24576> mPrimaryMetatiles{0}, mSecondaryMetatiles{0};
 
     bool mIs8BPP = false;
     bool mDirty = false;

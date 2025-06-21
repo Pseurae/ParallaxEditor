@@ -185,9 +185,9 @@ std::vector<unsigned short> LoadBinaryBlockData(const std::string &path)
 void TryOpenPrimaryMetatiles(void)
 {
     auto primaryTiles = LoadBinaryTilemap("testing/general_metatiles.bin");
-    global.renderer.LoadPrimaryMetatiles(primaryTiles);
+    global.context.LoadPrimaryMetatiles(primaryTiles);
     auto secondaryTiles = LoadBinaryTilemap("testing/petalburg_metatiles.bin");
-    global.renderer.LoadSecondaryMetatiles(secondaryTiles);
+    global.context.LoadSecondaryMetatiles(secondaryTiles);
 
     global.renderer.LoadPrimaryTileset("testing/general_tiles.png");
     global.renderer.LoadSecondaryTileset("testing/petalburg_tiles.png");
