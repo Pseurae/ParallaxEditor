@@ -10,7 +10,7 @@ void MainMenuBar(void)
     {
         if (ImGui::BeginMenu("Tilemap"))
         {
-            if (ImGui::MenuItem("Save Tilemap", nullptr, nullptr, global.context.IsLoaded()))
+            if (ImGui::MenuItem("Save Tilemap", nullptr, nullptr))
                 TryExportTilemap();
 
             if (ImGui::MenuItem("Open Project", nullptr, nullptr))

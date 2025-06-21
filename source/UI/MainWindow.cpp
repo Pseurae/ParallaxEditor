@@ -9,10 +9,12 @@
 
 void MainWindow(void)
 {
-    if (global.context.IsLoaded())
+    if (global.context.IsProjectLoaded())
+        OptionsPane();
+
+    if (global.context.IsMapLoaded())
     {
         TilesetPane();
-        OptionsPane();
         TilemapPane();
     }
 }

@@ -194,7 +194,25 @@ void TryOpenPrimaryMetatiles(void)
 
     OpenPaletteFolder("testing/palettes", 0, 13);
 
-    global.context.New(70, 50);
-    global.renderer.ResizeMapTexture(70, 50);
-    global.context.LoadBlockData(LoadBinaryBlockData("testing/map.bin"));
+    // global.context.New(70, 50);
+    // global.renderer.ResizeMapTexture(70, 50);
+    // global.context.LoadBlockData(LoadBinaryBlockData("testing/map.bin"));
+}
+
+void TryOpenMap(const std::string &mapName)
+{
+    auto primaryTiles = LoadBinaryTilemap("testing/general_metatiles.bin");
+    global.context.LoadPrimaryMetatiles(primaryTiles);
+    auto secondaryTiles = LoadBinaryTilemap("testing/petalburg_metatiles.bin");
+    global.context.LoadSecondaryMetatiles(secondaryTiles);
+
+    TryLoadPrimaryTileset("testing/general_tiles.png");
+    TryLoadSecondaryTileset("testing/petalburg_tiles.png");
+
+    OpenPaletteFolder("testing/palettes", 0, 13);
+
+    const auto &layout = global.context.GetMapLayout(mapName);
+    global.context.New(layout.width, layout.height);
+    global.renderer.ResizeMapTexture(layout.width, layout.height);
+    global.context.LoadBlockData(LoadBinaryBlockData(global.context.PathWithRoot(layout.blockDataPath)));
 }

@@ -15,3 +15,4 @@ void OpenPalette(unsigned int slot);
 void OpenPaletteFolder(const std::string &paletteFolderPath, int start, int end);
 void TryOpenProjectFolder(void);
 void TryOpenPrimaryMetatiles(void);
+void TryOpenMap(const std::string &mapName);

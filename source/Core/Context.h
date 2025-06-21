@@ -7,6 +7,13 @@
 #include "Utils/Palette.h"
 #include "Utils/Tile.h"
 
+struct Layout
+{
+    int width, height;
+    std::string primaryTileset, secondaryTileset;
+    std::string blockDataPath;
+};
+
 class Context final
 {
 public:
@@ -19,19 +26,17 @@ public:
 
     void Resize(int width, int height);
 
-    const std::string GetName() const;
     inline bool &IsDirty() { return mDirty; }
 
-    const std::string &GetPath() const { return mPath; }
     const auto &GetTiles(void) const { return mTiles; }
     void SetTiles(const std::unordered_map<TilePosition, Tile> &tiles) { mTiles = tiles; }
 
+    const std::string &GetProjectPath() const { return mProjectPath; }
     void OpenProjectFolder(const std::string &fname);
+    bool IsProjectLoaded(void) { return mProjectLoaded; }
     
     auto &PalettePaths(void) { return mPalettePaths; }
     auto &TilesetPaths(void) { return mTilesetPaths; }
-
-    bool IsLoaded(void) { return mLoaded; }
 
     const unsigned short GetWidth() const { return mWidth; }
     const unsigned short GetHeight() const { return mHeight; }
@@ -49,8 +54,21 @@ public:
     const auto &GetPrimaryMetatiles(void) const { return mPrimaryMetatiles; }
     const auto &GetSecondaryMetatiles(void) const { return mSecondaryMetatiles; }
 
+    bool IsMapLoaded(void) const { return mMapLoaded; }
+    const auto &GetMapOrderLabels(void) const { return mMapGroupOrders; }
+    const auto &GetGroupedMapLabels(void) const { return mGroupedMaps; }
+
+    std::string PathWithRoot(const std::string &fname);
+    const auto &GetMapLayout(const std::string &mapName) { return mLayouts[mMapToLayoutId[mapName]]; }
+
 private:
-    std::string mPath;
+    std::string LoadTextFile(const std::string &fname);
+
+    void LoadLayouts(void);
+    void LoadMaps(void);
+    void LinkMapsToLayouts(void);
+
+    std::string mProjectPath;
 
     unsigned short mWidth = 0, mHeight = 0;
     Tile mDefaultTile;
@@ -62,7 +80,13 @@ private:
     std::vector<unsigned short> mBlockData;
     std::array<Tile, 24576> mPrimaryMetatiles{0}, mSecondaryMetatiles{0};
 
+    std::unordered_map<std::string, Layout> mLayouts;
+    std::vector<std::string> mMapGroupOrders;
+    std::unordered_map<std::string, std::vector<std::string>> mGroupedMaps;
+
+    std::unordered_map<std::string, std::string> mMapToLayoutId;
+
     bool mIs8BPP = false;
     bool mDirty = false;
-    bool mLoaded = false, mProjectLoaded = false;
+    bool mProjectLoaded = false, mMapLoaded = false;
 };

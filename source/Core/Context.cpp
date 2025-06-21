@@ -5,13 +5,17 @@
 #include <fstream>
 #include "Context.h"
 #include "ParallaxEditor.h"
+#include <nlohmann/json.hpp>
+#include <regex>
+
+using json = nlohmann::json;
 
 void Context::New(int width, int height)
 {
     mWidth = width;
     mHeight = height;
     mTiles.clear();
-    mLoaded = true;
+    mMapLoaded = true;
 }
 
 void Context::Import(const std::vector<Tile> &tiles, int width, int height)
@@ -26,7 +30,7 @@ void Context::Import(const std::vector<Tile> &tiles, int width, int height)
         mTiles[TilePosition{x, y}] = tiles[x + y * width];
     }
 
-    mLoaded = true;
+    mMapLoaded = true;
 }
 
 static inline unsigned short ConvertTileToGBA(const Tile &tile)
@@ -65,11 +69,6 @@ void Context::Resize(int width, int height)
     mHeight = height;
 }
 
-const std::string Context::GetName() const
-{
-    return mPath.empty() ? "Untitled" : std::filesystem::path(mPath).filename().string();
-}
-
 void Context::AddTile(const TilePosition &pos, const Tile &tile)
 {
     mTiles[pos] = tile;
@@ -77,6 +76,12 @@ void Context::AddTile(const TilePosition &pos, const Tile &tile)
 
 void Context::OpenProjectFolder(const std::string &fname)
 {
+    mProjectPath = fname;
+    mProjectLoaded = true;
+
+    LoadLayouts();
+    LoadMaps();
+    LinkMapsToLayouts();
 }
 
 void Context::LoadBlockData(const std::vector<unsigned short> &blockData)
@@ -92,4 +97,71 @@ void Context::LoadPrimaryMetatiles(const std::vector<Tile> &tiles)
 void Context::LoadSecondaryMetatiles(const std::vector<Tile> &tiles)
 {
     std::copy(tiles.begin(), tiles.end(), mSecondaryMetatiles.data());
+}
+
+std::string Context::PathWithRoot(const std::string &path) {
+    if (mProjectPath.empty()) return path;
+    if (path.starts_with(mProjectPath)) return path;
+    return mProjectPath + "/" + path;
+}
+
+std::string Context::LoadTextFile(const std::string &fname)
+{
+    std::ifstream in(fname, std::ios::in | std::ios::binary);
+    if (in)
+    {
+        std::ostringstream contents;
+        contents << in.rdbuf();
+        in.close();
+        return(contents.str());
+    }
+
+    return "";
+}
+
+void Context::LoadLayouts(void)
+{
+    std::ifstream f(PathWithRoot("data/layouts/layouts.json"));
+    auto j = json::parse(f);
+    Layout l;
+
+    const auto &layouts = j.at("layouts");
+    for (const auto &v : layouts)
+    {
+        const auto &id = v.at("id").get<std::string>();
+        v.at("width").get_to(l.width);
+        v.at("height").get_to(l.height);
+        v.at("primary_tileset").get_to(l.primaryTileset);
+        v.at("secondary_tileset").get_to(l.secondaryTileset);
+        v.at("blockdata_filepath").get_to(l.blockDataPath);
+
+        mLayouts.insert({ id, l });
+    }
+}
+
+void Context::LoadMaps(void)
+{
+    std::ifstream f(PathWithRoot("data/maps/map_groups.json"));
+    auto j = json::parse(f);
+
+    for (const auto &[k, v] : j.items())
+    {
+        if (k == "group_order") mMapGroupOrders = v.template get<std::vector<std::string>>();
+        else mGroupedMaps[k] = v.template get<std::vector<std::string>>();
+    }
+}
+
+void Context::LinkMapsToLayouts(void)
+{
+    for (const auto &groupName : mMapGroupOrders)
+    for (const auto &mapName : mGroupedMaps[groupName])
+    {
+        std::ifstream f(PathWithRoot("data/maps/" + mapName + "/map.json"));
+        auto j = json::parse(f);
+
+        const auto layoutName = j.at("layout").get<std::string>();
+
+        if (!layoutName.empty())
+            mMapToLayoutId[mapName] = layoutName;
+    }
 }
