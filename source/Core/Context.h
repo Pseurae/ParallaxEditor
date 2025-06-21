@@ -31,7 +31,7 @@ public:
     auto &PalettePaths(void) { return mPalettePaths; }
     auto &TilesetPaths(void) { return mTilesetPaths; }
 
-    bool IsLoaded(void) { return mLoaded && mProjectLoaded; }
+    bool IsLoaded(void) { return mLoaded; }
 
     const unsigned short GetWidth() const { return mWidth; }
     const unsigned short GetHeight() const { return mHeight; }

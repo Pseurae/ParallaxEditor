@@ -2,17 +2,12 @@
 #include "Core/Snapshot.h"
 #include "UI/Helpers.h"
 #include "Global.h"
-#include "UI/Popups/NewTilemap.h"
-#include "UI/Popups/ImportTilemap.h"
 #include <GLFW/glfw3.h>
 
 static constexpr unsigned int sShortcutMask = GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT;
 
 static const Shortcut sShortcuts[] =
 {
-    { GLFW_KEY_N, GLFW_MOD_CONTROL, +[](void) { global.popupManager.Open<Popups::NewTilemap>(); } },
-    { GLFW_KEY_O, GLFW_MOD_CONTROL, +[](void) { global.popupManager.Open<Popups::ImportTilemap>(); } },
-    { GLFW_KEY_S, GLFW_MOD_CONTROL, +[](void) { if (global.context.IsLoaded()) TryExportTilemap(); } },
     { GLFW_KEY_Z, GLFW_MOD_CONTROL, action_stack_do_undo, true },
     { GLFW_KEY_Y, GLFW_MOD_CONTROL, action_stack_do_redo, true },
 };

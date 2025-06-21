@@ -38,8 +38,8 @@ static void TilemapWindow(void)
 
     auto tex = global.renderer.GetMapTex();
 
-    int xtiles = global.context.GetWidth(), 
-        ytiles = global.context.GetHeight();
+    int xtiles = global.context.GetWidth() * 2, 
+        ytiles = global.context.GetHeight() * 2;
 
     static constexpr ImVec2 tileSize = ImVec2(8, 8);
     float scale = 4.0f * global.zoomScale;

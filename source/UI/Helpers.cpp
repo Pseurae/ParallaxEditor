@@ -194,7 +194,7 @@ void TryOpenPrimaryMetatiles(void)
 
     OpenPaletteFolder("testing/palettes", 0, 13);
 
-    global.context.Resize(70, 50);
+    global.context.New(70, 50);
     global.renderer.ResizeMapTexture(70, 50);
     global.context.LoadBlockData(LoadBinaryBlockData("testing/map.bin"));
 }

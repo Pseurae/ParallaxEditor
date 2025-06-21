@@ -9,12 +9,10 @@
 
 void MainWindow(void)
 {
-    auto &tex = global.renderer.GetMetatileTex();
-    ImGui::Image(tex.id, ImVec2(tex.width, tex.height));
-    // if (global.context.IsLoaded())
-    // {
-    //     TilesetPane();
-    //     OptionsPane();
-    //     TilemapPane();
-    // }
+    if (global.context.IsLoaded())
+    {
+        TilesetPane();
+        OptionsPane();
+        TilemapPane();
+    }
 }

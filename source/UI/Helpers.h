@@ -5,8 +5,6 @@
 #include "Utils/Tile.h"
 
 void CreateNewTilemap(int, int);
-void TryLoadTilemap(void);
-void TrySaveTilemap(void);
 std::vector<Tile> LoadBinaryTilemap(const std::string &path);
 void TryImportTilemap(const std::vector<Tile> &tiles, int width);
 void TryExportTilemap(void);

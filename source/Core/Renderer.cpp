@@ -206,7 +206,7 @@ void Renderer::DrawTilemap(const Context &ctx)
     glBindFramebuffer(GL_FRAMEBUFFER, mLightMapTex.fbo);
     glViewport(0, 0, mLightMapTex.tex.width, mLightMapTex.tex.height);
 
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     BatchBackground(ctx.GetDefaultTile());
@@ -241,8 +241,8 @@ void Renderer::DrawMetatiles(const Context &ctx)
 
     const auto &blockData = ctx.GetBlockData();
 
-    for (int y = 0; y < ctx.GetWidth(); ++y)
-    for (int x = 0; x < ctx.GetHeight(); ++x)
+    for (int y = 0; y < ctx.GetHeight(); ++y)
+    for (int x = 0; x < ctx.GetWidth(); ++x)
     {
         drawMetatile(blockData[y * ctx.GetWidth() + x] & 0b111111111111, x * 2, y * 2);
     }

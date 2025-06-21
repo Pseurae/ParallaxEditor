@@ -48,8 +48,8 @@ struct GbaTile
 void Context::Export(const std::string &path)
 {
     std::ofstream fs(path);
-    for (unsigned int y = 0; y < mHeight; ++y)
-    for (unsigned int x = 0; x < mWidth; ++x)
+    for (unsigned int y = 0; y < mHeight * 2; ++y)
+    for (unsigned int x = 0; x < mWidth * 2; ++x)
     {
         const auto &tile = mTiles.contains({ x, y }) ? mTiles.at({ x, y }) : mDefaultTile;
         // unsigned short bytes = ConvertTileToGBA(tile);

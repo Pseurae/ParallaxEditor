@@ -1,9 +1,6 @@
 #include "UI/Helpers.h"
 #include <imgui.h>
 #include "Global.h"
-#include "UI/Popups/ImportTilemap.h"
-#include "UI/Popups/NewTilemap.h"
-#include "UI/Popups/Palettes.h"
 #include "Utils/FileDialog.h"
 #include "Core/Snapshot.h"
 
@@ -13,12 +10,6 @@ void MainMenuBar(void)
     {
         if (ImGui::BeginMenu("Tilemap"))
         {
-            if (ImGui::MenuItem("New Tilemap"))
-                global.popupManager.Open<Popups::NewTilemap>();
-
-            if (ImGui::MenuItem("Open Tilemap", nullptr, nullptr))
-                global.popupManager.Open<Popups::ImportTilemap>();
-
             if (ImGui::MenuItem("Save Tilemap", nullptr, nullptr, global.context.IsLoaded()))
                 TryExportTilemap();
 
