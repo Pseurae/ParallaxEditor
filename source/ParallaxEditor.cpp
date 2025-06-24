@@ -62,31 +62,6 @@ int main(int argc, char *argv[])
 
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.0, 0.0, 0.0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // Renderer Call
-        global.renderer.Draw(global.context);
-
-        {
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-
-            {
-                MainWindow();
-                MainMenuBar();
-                global.popupManager.DrawAndUpdate();
-            }
-
-            int displayW, displayH;
-            ImGui::Render();
-            glfwGetFramebufferSize(window, &displayW, &displayH);
-            glViewport(0, 0, displayW, displayH);
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        }
-
-        glfwSwapBuffers(window);
         if (!glfwGetWindowAttrib(window, GLFW_VISIBLE) || 
             glfwGetWindowAttrib(window, GLFW_ICONIFIED)) 
         {
@@ -94,6 +69,32 @@ int main(int argc, char *argv[])
         }
         else
         {
+            glClearColor(0.0, 0.0, 0.0, 1.0);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            // Renderer Call
+            global.renderer.Draw(global.context);
+
+            {
+                ImGui_ImplOpenGL3_NewFrame();
+                ImGui_ImplGlfw_NewFrame();
+                ImGui::NewFrame();
+
+                {
+                    MainWindow();
+                    MainMenuBar();
+                    global.popupManager.DrawAndUpdate();
+                }
+
+                int displayW, displayH;
+                ImGui::Render();
+                glfwGetFramebufferSize(window, &displayW, &displayH);
+                glViewport(0, 0, displayW, displayH);
+                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            }
+
+            glfwSwapBuffers(window);
+
             glfwPollEvents();
         }
     }
