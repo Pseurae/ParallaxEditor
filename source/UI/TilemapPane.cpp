@@ -125,8 +125,14 @@ static void TilemapWindow(void)
 
                 if (brush.height == 1 && brush.width == 1)
                 {
-                    brush.xflip = brush.selection[x + y * brush.width].xflip;
-                    brush.yflip = brush.selection[x + y * brush.width].yflip;
+                    Tile &tile = brush.selection[x + y * brush.width];
+                    brush.xflip = tile.xflip;
+                    brush.yflip = tile.yflip;
+
+                    tile.xflip = false;
+                    tile.yflip = false;
+
+                    global.renderer.SetPickerPaletteNum(tile.palette);
                 }
             }
         }

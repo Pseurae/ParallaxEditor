@@ -3,6 +3,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <algorithm>
 
 ImRect GetSelectionRectFromDrag(ImVec2 start, ImVec2 end, const ImVec2 &tileSize);
 
@@ -107,7 +108,7 @@ void TilesetPane(void)
 
     int palNum = global.renderer.GetPickerPaletteNum();
     if (ImGui::InputInt("Palette", &palNum))
-        global.renderer.SetPickerPaletteNum(std::min(std::max(palNum, 0), 15));
+        global.renderer.SetPickerPaletteNum(std::clamp(palNum, 0, 15));
 
     ImGui::Spacing();
 
