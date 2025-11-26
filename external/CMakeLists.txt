@@ -10,6 +10,7 @@ FetchContent_Declare(glfw
 )
 
 set(GLFW_BUILD_DOCS FALSE)
+set(GLFW_BUILD_WAYLAND FALSE)
 FetchContent_MakeAvailable(glfw)
 
 FetchContent_Declare(gl3w 
