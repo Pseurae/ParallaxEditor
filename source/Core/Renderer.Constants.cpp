@@ -108,7 +108,7 @@ const unsigned char sDefaultPalette[] =
     16 * 15, 16 * 15, 16 * 15,
 };
 
-static const unsigned char transparentUnderlayColors[] = 
+const unsigned char transparentUnderlayColors[] = 
 {
     0, 0, 0, 0
 };
